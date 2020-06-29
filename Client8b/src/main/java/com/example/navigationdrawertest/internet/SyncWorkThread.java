@@ -1751,15 +1751,12 @@ public class SyncWorkThread extends Thread {
 					return false;
 				}
 				String taskxml = ConverXML.ConverTaskToXml(task);
-
 				// 上传步骤三
 				String taskHtml = CommonUtil.ConverHtmlToString(task);
 				if ("".equals(taskHtml)) {
-					errorMessage = "检查表格Id号为：'" + task.getTaskid()
-							+ "'上传失败！(读取本地html出错)";
+					errorMessage = "检查表格Id号为：'" + task.getTaskid() + "'上传失败！(读取本地html出错)";
 					return false;
 				}
-
 				String script = "<script type=\"text/javascript\">	function showImage(imageFile,type){ 		if(window.showImageObj==undefined || window.showImageObj==null)		{			window.browser(imageFile,type);		}		else		{			window.showImageObj.clickOnAndroid(imageFile,type);		} 	}</script>";
 				String html = taskHtml.contains("<body>") ? (script + taskHtml
 						.split("<body>")[1].split("</body>")[0]) : taskHtml;
