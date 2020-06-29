@@ -1760,10 +1760,6 @@ public class SyncWorkThread extends Thread {
 					return false;
 				}
 
-//				else{
-//					//上传步骤六，删除已经上传的图片
-//				}
-
 				String script = "<script type=\"text/javascript\">	function showImage(imageFile,type){ 		if(window.showImageObj==undefined || window.showImageObj==null)		{			window.browser(imageFile,type);		}		else		{			window.showImageObj.clickOnAndroid(imageFile,type);		} 	}</script>";
 				String html = taskHtml.contains("<body>") ? (script + taskHtml
 						.split("<body>")[1].split("</body>")[0]) : taskHtml;
