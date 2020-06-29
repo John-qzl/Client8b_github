@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--<string name="app_name">产品现场测试与验收数据包APP</string>-->
+    <string name="app_name">离线数据采集系统</string>
+
+    <string name="docactivity">多媒体资料</string>
+    <string name="media">多媒体资料</string>
+    <string name="customer">8B</string>
+    <string name="action_search">搜索</string>
+    <string name="action_refresh">数据同步</string>
+    <string name="action_refresh_done">已完成数据同步</string>
+    <string name="action_share">分享</string>
+    <string name="action_photo">拍照</string>
+    <string name="look_photo">查看相册</string>
+    <string name="select_photo">从系统相册选择照片</string>
+
+    <string name="desc_list_item_icon">Item Icon</string>
+    
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+
+    <string name="action_fanhui">返回</string>
+    <string name="action_exit">退出</string>
+    <string name="action_plus">功能</string>
+    <string name="action_album">多媒体资料</string>
+    <string name="action_collection">我的收藏</string>
+    <string name="action_card">我的银行卡</string>
+    <string name="action_settings">设置</string>
+    <string name="action_feed">意见反馈</string>
+    <string name="plus_group_chat">发起群聊</string>
+    <string name="plus_add_friend">添加朋友</string>
+    <string name="plus_video_chat">视频聊天</string>
+    <string name="plus_scan">扫一扫</string>
+    <string name="plus_take_photo">拍照分享</string>
+    <string name="action_save">保存</string>
+    <string name="cehua">策划</string>
+
+    <string name="setting">设置</string>
+    <string name="exit">退出</string>
+    <string name="listsyncmessage">同步上传下载信息一览表</string>
+    
+    <!-- 代码中String -->
+    <string name="tree_item_sign">签署</string>
+    <string name="tree_item_check">检 查</string>
+    <string name="tree_item_look">查 看</string>
+    <string name="write_sign">签名</string>
+    <string name="write_signname">签署人：</string>
+    
+    <!-- dialog -->
+    <string name="default_progressbar">Default Progressbar:</string>
+    <string name="dialog_default_title">Here\'s a message!</string>
+    <string name="dialog_ok">OK</string>
+    <string name="dialog_cancel">Cancel</string>
+    <string name="LOADING">Loading......</string>
+    
+    
+    <!-- 存储文件文件夹 -->
+    <string name="Files">Files</string>
+    <!-- 图像文件夹 -->
+    <string name="Image">Image</string>
+    <!-- 缩略图文件夹 -->
+    <string name="Thumbnail">Thumbnail</string>
+    <!-- 视频文件夹 -->
+    <string name="Video">Video</string>
+    <string name="album_enter_select">选择</string>
+    <string name="api_cancel">取消</string>
+    <string name="album_photo_select_tip">项</string>
+    <string name="album_phoot_select_all">全选</string>
+    <string name="album_phoot_unselect_all">取消全选</string>
+    <string name="album_title">我的相册</string>
+    <string name="pgcommon_share">分享</string>
+    <string name="common_cut">移动</string>
+    <string name="common_delete">删除</string>
+    <string name="common_edit">编辑</string>
+    <string name="album_message">图片&amp;视频</string>
+    
+    
+    <string name="please_input">请输入</string>
+    <string name="title_alert">ip端口设置</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+
+    <string name="all_pic">全部图片</string>
+    <string name="preview_without_num">预览</string>
+    <string name="preview_with_num">预览(%1$d)</string>
+    <string name="choose_pic_finish">完成</string>
+    <string name="choose_pic_finish_with_num">完成(%1$d/%2$d)</string>
+    <string name="choose_pic_num_out_of_index">你最多只能选择%1$d张照片</string>
+    <string name="choose_pic">选择</string>
+    <string name="not_choose_any_pick">你还没有选择任何图片</string>
+    <string name="uploading_images">正在批量上传</string>
+
+    <string name="finish">完成</string>
+    <string name="open_READ_EXTERNAL_STORAGE">请先允许程序访问储存空间</string>
+    <string name="open_CAMERA">请先允许程序打开照相机</string>
+    <string name="open_Location">请先允许程序打开定位服务</string>
+    <string name="choose">选择</string>
+    <string name="photo">手机</string>
+
+    <string name="library_name">媒体选择器</string>
+    <string name="all_dir_name">所有图片和视频</string>
+    <string name="all_video">所有视频</string>
+    <string name="all_image">所有图片</string>
+    <string name="select_title">选择图片和视频</string>
+    <string name="select_video_title">选择视频</string>
+    <string name="select_image_title">选择图片</string>
+    <string name="video_dir_name">所有视频</string>
+    <string name="msg_amount_limit">已达到选择数量上限</string>
+    <string name="msg_size_limit">请压缩和剪切后上传，文件最大只支持</string>
+    <string name="select_null">请选择文件</string>
+    <string name="done">完成</string>
+    <string name="count_string">个</string>
+    <string name="preview">预览</string>
+    <string name="select">选择</string>
+    <string name="video">视频</string>
+    <string name="cant_play_video">没有可以播放的程序</string>
+    <string name="READ_EXTERNAL_STORAGE">需要打开读取存储权限</string>
+
+    <string name="check_warn">！！！注意:点击该按钮表示该表单的检查工作已经完成，并且表单将会进入待签署状态，不能再次检查。</string>
+    
+    
+</resources>
