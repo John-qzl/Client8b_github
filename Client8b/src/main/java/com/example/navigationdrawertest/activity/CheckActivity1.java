@@ -17,6 +17,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -182,17 +183,17 @@ public class CheckActivity1 extends BaseActivity implements ObservableScrollView
 		checkSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {  
             @Override  
             public void onCheckedChanged(CompoundButton buttonView,  
-                    boolean isChecked) {  
-                if(isChecked) {  	//任务完成
-                	currentTask.setEndTime(DateUtil.getCurrentDate());
-                	currentTask.setLocation(2);
-                	currentTask.save();
-                }else {					//任务没有完成
-                	currentTask.setEndTime("");
-                	currentTask.setLocation(1);
-                	currentTask.save();
-                }  
-            }  
+                    boolean isChecked) {
+				if (isChecked) {    //任务完成
+					currentTask.setEndTime(DateUtil.getCurrentDate());
+					currentTask.setLocation(2);
+					currentTask.save();
+				} else {                    //任务没有完成
+					currentTask.setEndTime("");
+					currentTask.setLocation(1);
+					currentTask.save();
+				}
+			}
         });
 		if (!currentTask.getStartTime().equals("") || currentTask.getStartTime() != null) {
 			currentTask.setStartTime(DateUtil.getCurrentDate());
@@ -254,25 +255,16 @@ public class CheckActivity1 extends BaseActivity implements ObservableScrollView
 
 			@Override
 			public void onClick(View v) {
-				CheckActivity1.this.prodlg = ProgressDialog.show(CheckActivity1.this, "返回", "正在保存数据");
-				if (OrientApplication.app.getPageflage() > 1) {
-					OrientApplication.app.setPageflage(pagetype-1);
-				}
-				prodlg.setIcon(CheckActivity1.this.getResources().getDrawable(R.drawable.logo_title));
-				new Thread(new Runnable() {
-					@Override
-					public void run() {
-						for(HtmlData data : htmlList){
-							HtmlHelper.changeCheckValue(htmlDoc, data.getCell(), data.getId());
-						}
-						for(HtmlData data : htmlList_text){
-							HtmlHelper.changeTextValue(htmlDoc, data.getCell(), data.getId());
-						}
-						Message message = new Message();
-						message.what = 1;
-						mHandler.sendMessage(message);
+//				(checkComplete() != 0 && currentTask.getLocation() == 1) || checkComplete() == 0
+				if (currentTask.getTaskname().contains("验收报告")) {
+					if (checkComplete() != 0 && currentTask.getLocation() == 2) {
+						commitWarnInfo();
+					} else {
+						back();
 					}
-				}).start();
+				} else {
+					back();
+				}
 			}
 		});
 
@@ -366,19 +358,8 @@ public class CheckActivity1 extends BaseActivity implements ObservableScrollView
 		mWanzhengxing.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				//实测值
-				List<Cell> actualvalCellList = DataSupport.where("taskid=? and type=?", task_id+"", "TRUE").find(Cell.class);
-				String actualvalNum = "";
-				int isWanzheng = 0;
-				if (actualvalCellList.size() > 0) {
-					for (Cell cell : actualvalCellList) {
-						actualvalNum = cell.getOpvalue();
-						if (actualvalNum.equals("")) {
-							isWanzheng = isWanzheng + 1;
-						}
-					}
-				}
-				if (isWanzheng != 0) {
+
+				if (checkComplete() != 0) {
 					Toast.makeText(context, "存在未填写的值!", Toast.LENGTH_SHORT).show();
 				} else {
 					Toast.makeText(context, "全部填写完成!", Toast.LENGTH_SHORT).show();
@@ -2453,5 +2434,70 @@ public class CheckActivity1 extends BaseActivity implements ObservableScrollView
 		HtmlData data = new HtmlData(cell, operation.getRealcellid());
 //        HtmlData data = new HtmlData(cell, cell.getCellid());
 		htmlList_text.add(data);
+	}
+
+	/**
+	 * @Description: 采集值完整性检查 isWanzheng=0采集值全部填写完成
+	 * @author qiaozhili
+	 * @date 2020/6/29 17:25
+	 * @param
+	 * @return
+	 */
+	public int checkComplete() {
+		List<Cell> actualvalCellList = DataSupport.where("taskid=? and type=?", task_id+"", "TRUE").find(Cell.class);
+		String actualvalNum = "";
+		int isWanzheng = 0;
+		if (actualvalCellList.size() > 0) {
+			for (Cell cell : actualvalCellList) {
+				actualvalNum = cell.getOpvalue();
+				if (actualvalNum.equals("")) {
+					isWanzheng = isWanzheng + 1;
+				}
+			}
+		}
+		return isWanzheng;
+	}
+
+	public void commitWarnInfo() {
+		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+		dialog.setIcon(R.drawable.logo_title).setTitle("警告！");
+		dialog.setMessage("存在为填写的数据，请全部填写完整后重试！");
+		dialog.setCancelable(false);
+		dialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+
+			}
+		});
+//		dialog.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+//			@Override
+//			public void onClick(DialogInterface dialog, int which) {
+//				dialog.dismiss();
+//			}
+//		});
+		dialog.show();
+	}
+
+	private void back() {
+		CheckActivity1.this.prodlg = ProgressDialog.show(CheckActivity1.this, "返回", "正在保存数据");
+		if (OrientApplication.app.getPageflage() > 1) {
+			OrientApplication.app.setPageflage(pagetype-1);
+		}
+		prodlg.setIcon(CheckActivity1.this.getResources().getDrawable(R.drawable.logo_title));
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				for(HtmlData data : htmlList){
+					HtmlHelper.changeCheckValue(htmlDoc, data.getCell(), data.getId());
+				}
+				for(HtmlData data : htmlList_text){
+					HtmlHelper.changeTextValue(htmlDoc, data.getCell(), data.getId());
+				}
+				Message message = new Message();
+				message.what = 1;
+				mHandler.sendMessage(message);
+			}
+		}).start();
 	}
 }

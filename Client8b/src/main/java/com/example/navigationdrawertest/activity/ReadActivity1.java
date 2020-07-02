@@ -370,6 +370,12 @@ public class ReadActivity1 extends BaseActivity implements ObservableScrollView.
 					EditText edittext2 = new EditText(context);
 					edittext2.setText(CheckActivity1.replaceStr(str));
 					edittext2.setTextSize(16);
+					if (cell.getIsFuhe() != null) {
+						if (cell.getIsFuhe().equals(Config.bufuhe)) {
+//							edittext2.setTextColor(this.getResources().getColor(R.color.red));
+							edittext2.setBackgroundColor(getResources().getColor(R.color.red));
+						}
+					}
 					edittext2.setEnabled(false);
 					edittext2.setTextColor(getResources().getColor(R.color.textcolor));
 					linear2.addView(edittext2, para2_1);

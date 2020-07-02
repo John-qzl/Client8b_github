@@ -323,6 +323,14 @@ public class FragmentSign extends Fragment {
 			int layer = nodeList.get(position).getLayer();
 			Long pathId = nodeList.get(position).getId();
 			final List<Task> taskList = DataSupport.where("chid = ? and location=?", String.valueOf(pathId), "2").find(Task.class);
+			String broTaskId = "";
+			if (layer == 4) {
+				List<Task> taskList1 = DataSupport.where("taskid = ?", String.valueOf(nodeList.get(position).getId())).find(Task.class);
+				if (taskList1.size() > 0) {
+					broTaskId = taskList1.get(0).getBroTaskId();
+				}
+			}
+			int[] leftIds = { R.drawable.icon_plusminus_add_black, R.drawable.icon_plusminus_reduce_black, R.drawable.icon_head_default, R.drawable.check};
 			if (convertView == null) {
 				LayoutInflater inflater = LayoutInflater.from(context);
 				holder = new ViewHolder();
@@ -443,8 +451,12 @@ public class FragmentSign extends Fragment {
 			holder.tv_name.setText("" + nodeList.get(position).getName());
 			holder.tv_width.setText("");
 
-			int[] leftIds = { R.drawable.icon_plusminus_add_black, R.drawable.icon_plusminus_reduce_black, R.drawable.icon_head_default };
 			holder.iv_left.setImageResource(leftIds[nodeList.get(position).getExpandStatus()]);
+			if (nodeList.get(position).getExpandStatus() == 2 && broTaskId != null) {
+				holder.iv_left.setImageResource(leftIds[3]);
+			}
+//			int[] leftIds = { R.drawable.icon_plusminus_add_black, R.drawable.icon_plusminus_reduce_black, R.drawable.icon_head_default };
+//			holder.iv_left.setImageResource(leftIds[nodeList.get(position).getExpandStatus()]);
 			int[] rightIds = { R.drawable.icon_checkbox_none, R.drawable.icon_checkbox_all, R.drawable.icon_checkbox_part };
 			holder.tv_width.setMinWidth(layer * (holder.iv_left.getLayoutParams().width));
 

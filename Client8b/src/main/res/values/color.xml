@@ -58,6 +58,7 @@
     <color name="text_light_blue">#2d7ac1</color>
     <color name="reveal_color">#1b000000</color>
     <color name="light_green">#0ac39e</color>
+    <color name="little_green">#0ac39e</color>
 
 
     <color name="actionbar">#1d8ae7</color>

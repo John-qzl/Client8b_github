@@ -8,7 +8,9 @@ import org.greenrobot.eventbus.Subscribe;
 import org.jsoup.nodes.Document;
 import org.litepal.crud.DataSupport;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -109,7 +111,7 @@ public class SignActivity1 extends BaseActivity implements ObservableScrollView.
 
 	private LinearLayout mLinSign, lin_back;
 	private RelativeLayout mBottom;
-	private Button mProview, mNext;
+	private Button mProview, mNext, mSign_finish;
 	private int rowsnum;
 	private int pagetype;
 	private int totalPhNumber = 0;
@@ -163,8 +165,15 @@ public class SignActivity1 extends BaseActivity implements ObservableScrollView.
 		listView_1 = (NoScrollListview) findViewById(R.id.sign_mylistview_1);
 		listView_3 = (ListView) findViewById(R.id.sign_mylistview_3);
 		mLinSign = (LinearLayout) findViewById(R.id.lin_signname);
+		mSign_finish = (Button) findViewById(R.id.button_signfinish);
 		mTablename = (TextView) findViewById(R.id.table_name);
 		mTotalPhNum = (TextView) findViewById(R.id.tv_totalPhNum);
+		mSign_finish.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				signFinishWarnInfo();
+			}
+		});
 		mClose = (ImageView) findViewById(R.id.sign_close);
 		mClose.setOnClickListener(new OnClickListener() {
 			@Override
@@ -367,6 +376,12 @@ public class SignActivity1 extends BaseActivity implements ObservableScrollView.
 					edittext2.setText(CheckActivity1.replaceStr(str));
 					edittext2.setTextSize(16);
 					edittext2.setTextColor(getResources().getColor(R.color.textcolor));
+					if (cell.getIsFuhe() != null) {
+						if (cell.getIsFuhe().equals(Config.bufuhe)) {
+//							edittext2.setTextColor(this.getResources().getColor(R.color.red));
+							edittext2.setBackgroundColor(getResources().getColor(R.color.red));
+						}
+					}
 					edittext2.addTextChangedListener(new TextWatcher() {
 						@Override
 						public void onTextChanged(CharSequence text, int start, int before,
@@ -1647,5 +1662,31 @@ public class SignActivity1 extends BaseActivity implements ObservableScrollView.
 		if (locationEvent.getContent().equals("finish")) {
 			finish();
 		}
+	}
+
+
+	public void signFinishWarnInfo() {
+		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+		dialog.setIcon(R.drawable.logo_title).setTitle("提示");
+		dialog.setMessage("是否确认签署完成？");
+		dialog.setCancelable(false);
+		dialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				currentTask.setLocation(3);
+				currentTask.save();
+				EventBus.getDefault().post(new LocationEvent("ok"));
+				finish();
+				dialog.dismiss();
+
+			}
+		});
+		dialog.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+			}
+		});
+		dialog.show();
 	}
 }

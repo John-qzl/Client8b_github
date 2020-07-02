@@ -365,7 +365,7 @@ public class FragmentCheck extends Fragment {
 			List<Task> taskList = new ArrayList<Task>();
 			if (layer == 3) {
 				Long chId = nodeList.get(position).getId();
-				taskList = DataSupport.where("chid = ? and location=?", String.valueOf(chId), "1").find(Task.class);
+				taskList = DataSupport.where("chid = ? and location=? and IsBrother = ?", String.valueOf(chId), "1", "0").find(Task.class);
 			}
 			String broTaskId = "";
 			if (layer == 4) {
