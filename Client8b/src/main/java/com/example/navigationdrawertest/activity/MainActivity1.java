@@ -99,7 +99,7 @@ public class MainActivity1 extends FragmentActivity implements OnItemClickListen
 
     private DrawerLayout mDrawerLayout;
     private ImageView leftMenu, mDoneSync;
-    private LinearLayout mSyn, mMedia, mQuit;
+    private LinearLayout mSyn, mMedia, mQuit, mSign;
     private TextView mtitle, mLoginName;
     private ListView mDrawerList;
     private NavDrawerListAdapter mAdapter;
@@ -139,6 +139,7 @@ public class MainActivity1 extends FragmentActivity implements OnItemClickListen
         leftMenu = (ImageView) findViewById(R.id.leftmenu);
         mtitle = (TextView) findViewById(R.id.title);
         mSyn = (LinearLayout) findViewById(R.id.data_syn);
+        mSign = (LinearLayout) findViewById(R.id.signPhoto_collect);
 //        mDoneSync = (ImageView) findViewById(R.id.done_data_syn);
         mMedia = (LinearLayout) findViewById(R.id.media);
         mQuit = (LinearLayout) findViewById(R.id.quit);
@@ -336,14 +337,21 @@ public class MainActivity1 extends FragmentActivity implements OnItemClickListen
 //                }
 //            }
 //        });
+        mSign.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity1.this, SignPhotoCollectActivity.class);
+                startActivity(intent);
+            }
+        });
         mNavMenuIconsTypeArray = getResources()
                 .obtainTypedArray(R.array.nav_drawer_icons);
 
         mNavDrawerItems = new ArrayList<NavDrawerItem>();
         //左侧项目树展现方法2，根据RwRelation表格展现----数据表采用
-//        List<RwRelation> proList = DataSupport.where("userid = ?", OrientApplication.getApplication().loginUser.getUserid()).find(RwRelation.class);
+        List<RwRelation> proList = DataSupport.where("userid = ?", OrientApplication.getApplication().loginUser.getUserid()).find(RwRelation.class);
         //20200610 暂时放开PAD上人员查看数据权限
-        List<RwRelation> proList = DataSupport.findAll(RwRelation.class);
+//        List<RwRelation> proList = DataSupport.findAll(RwRelation.class);
         projectList = proList;
         for(int i=0; i<proList.size(); i++){
             mNavDrawerItems.add(new NavDrawerItem(proList.get(i).getRwname(), mNavMenuIconsTypeArray

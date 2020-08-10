@@ -17,16 +17,12 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.text.Html;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnTouchListener;
-import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -46,14 +42,10 @@ import com.example.navigationdrawertest.CustomUI.ObservableScrollView;
 import com.example.navigationdrawertest.CustomUI.SyncHorizontalScrollView;
 import com.example.navigationdrawertest.R;
 import com.example.navigationdrawertest.CustomUI.NoScrollListview;
-import com.example.navigationdrawertest.CustomUI.MyScrollView.OnScrollListener;
-import com.example.navigationdrawertest.adapter.ConditionAdapter;
 import com.example.navigationdrawertest.adapter.ConditionAdapter1;
 import com.example.navigationdrawertest.adapter.Event;
-import com.example.navigationdrawertest.adapter.SignAdapter;
 import com.example.navigationdrawertest.adapter.SignAdapter1;
 import com.example.navigationdrawertest.application.OrientApplication;
-import com.example.navigationdrawertest.camera.AlbumAty;
 import com.example.navigationdrawertest.data.AerospaceDB;
 import com.example.navigationdrawertest.model.Cell;
 import com.example.navigationdrawertest.model.Operation;
@@ -371,7 +363,7 @@ public class ReadActivity1 extends BaseActivity implements ObservableScrollView.
 					edittext2.setText(CheckActivity1.replaceStr(str));
 					edittext2.setTextSize(16);
 					if (cell.getIsFuhe() != null) {
-						if (cell.getIsFuhe().equals(Config.bufuhe)) {
+						if (cell.getIsFuhe().equals(Config.buhege)) {
 //							edittext2.setTextColor(this.getResources().getColor(R.color.red));
 							edittext2.setBackgroundColor(getResources().getColor(R.color.red));
 						}

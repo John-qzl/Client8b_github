@@ -40,6 +40,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -52,7 +53,7 @@ public class DocActivity extends BaseActivity{
 	private ListView searchList;
 	private ProgressDialog progressDialog;
 	private Context context;
-	private ImageView mBack;
+	private LinearLayout mBack;
 	private String nowProductId;
 	
 	@Override
@@ -71,7 +72,7 @@ public class DocActivity extends BaseActivity{
 	
 	public void initUI(){
 		searchList = (ListView) findViewById(R.id.doclist_list);
-		mBack = (ImageView) findViewById(R.id.back);
+		mBack = (LinearLayout) findViewById(R.id.back);
 		mBack.setOnClickListener(new View.OnClickListener() {
 
             @Override

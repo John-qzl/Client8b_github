@@ -13,6 +13,7 @@ public class User extends DataSupport{
 	private String username;
 	private String password;
 	private String displayname;
+	private int loginFailureTimes;
 	//2016-3-15 13:56:34
 	private String ttidandname;			//工作队的ID和NAME（id,name;id,name）
 	
@@ -41,7 +42,15 @@ public class User extends DataSupport{
 	 * 非数据库声明字段	
 	 */
 	public List<String> postids;		//该用户所属岗位模板ID
-	
+
+	public int getLoginFailureTimes() {
+		return loginFailureTimes;
+	}
+
+	public void setLoginFailureTimes(int loginFailureTimes) {
+		this.loginFailureTimes = loginFailureTimes;
+	}
+
 	public int getId() {
 		return id;
 	}

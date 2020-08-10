@@ -102,6 +102,7 @@ public class LoginActivity extends BaseActivity{
 	private Context context;
 	private AlertDialog.Builder dialog;
 	private TextView mVersion;
+	private int loginFailureTimes = 0;
 	
 	private Handler mHandler = new Handler() {
         @Override
@@ -412,36 +413,7 @@ public class LoginActivity extends BaseActivity{
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						dialog.dismiss();
-						prodlg = ProgressDialog.show(context, "警告", "正在清空数据库，请稍侯...");
-						new Thread(new Runnable() {
-				            @Override
-				            public void run() {
-				                try{
-				                	Message message = new Message();
-				                	DataSupport.deleteAll(Cell.class);
-				                	DataSupport.deleteAll(Scene.class);
-				                	DataSupport.deleteAll(Operation.class);
-				                	DataSupport.deleteAll(Post.class);
-				                	DataSupport.deleteAll(Signature.class);
-				                	DataSupport.deleteAll(Task.class);
-				                	DataSupport.deleteAll(User.class);
-				                	DataSupport.deleteAll(Rw.class);
-				                	DataSupport.deleteAll(RwRelation.class);
-				                	DataSupport.deleteAll(Diagram.class);
-				                	DataSupport.deleteAll(Mmc.class);
-				                	DataSupport.deleteAll(Product.class);
-				                	DataSupport.deleteAll(UploadFileRecord.class);
-									File v2pFile = new File(Environment.getExternalStorageDirectory() + Config.rootPath);
-									File mmcFile = new File(Environment.getExternalStorageDirectory() + Config.mmcPath);
-									deleteFiles(v2pFile);
-									deleteFiles(mmcFile);
-				                	message.what = 1;
-				                	mHandler.sendMessage(message);
-				                }catch (Exception e) {
-				                    Log.e("clear database",e.toString());
-				                }
-				            }
-				        }).start();
+						clearDataBase();
 					}
 				});
 				dialog.setNegativeButton("否", new DialogInterface.OnClickListener() {
@@ -570,13 +542,31 @@ public class LoginActivity extends BaseActivity{
 	public void offline(String username, String password){
 		List<User> userList = DataSupport.where("username = ?", username).find(User.class);
 		if(userList.size() == 0){	//该用户不存在,警告框
-			alert("离线登录：该用户不存在");
+			alert("离线登录：该用户不存在（请联系管理员下载数据）");
 		}else{							//该用户存在
 			//验证用户名和密码
-			String dataPassword = DataSupport.select("password").where("username = ?", 
-					username).find(User.class).get(0).getPassword();
+			final User curUser = DataSupport.where("username = ?",username).find(User.class).get(0);
+			String dataPassword = curUser.getPassword();
+			final int failureTimes = curUser.getLoginFailureTimes();
 			if(!dataPassword.equals(PasswordUtil.generatePassword(password))){
-				alert("离线登录：密码填写错误！");
+				new AlertDialog.Builder(this).setMessage("离线登录：密码填写错误！" + "\n" + "(密码输入错误" + (failureTimes + 1) + "次，超过5次将自动删除所有数据！）")
+						.setIcon(R.drawable.logo_title).setTitle(R.string.app_name)
+						.setCancelable(false)
+						.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int id) {
+								curUser.setLoginFailureTimes(failureTimes + 1);
+								curUser.save();
+								//失败超过5次，清空数据库
+								if (failureTimes + 1 >= 5) {
+									clearDataBase();
+								}
+								isClicked = false;
+								dialog.cancel();
+								prodlg.cancel();
+							}
+						}).show();
+
 			}else{
 				User user = new User();
 				user.setUsername(username);
@@ -584,6 +574,8 @@ public class LoginActivity extends BaseActivity{
 				String userId = DataSupport.select("userid").where("username = ?", username).find(User.class).get(0).getUserid();
 				user.setUserid(userId);
 				OrientApplication.getApplication().loginUser = user;
+				curUser.setLoginFailureTimes(0);
+				curUser.save();
 //				MainActivity.actionStart(LoginActivity.this); 
 				Intent intent = new Intent(this, MainActivity1.class);
 	        	startActivity(intent);
@@ -800,4 +792,43 @@ public class LoginActivity extends BaseActivity{
 		return true;
 	}
 
+	/**
+	 * @param
+	 * @return
+	 * @Description: 清空数据库
+	 * @author qiaozhili
+	 * @date 2020/8/7 14:06
+	 */
+	public void clearDataBase() {
+		prodlg = ProgressDialog.show(context, "警告", "正在清空数据库，请稍侯...");
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try{
+					Message message = new Message();
+					DataSupport.deleteAll(Cell.class);
+					DataSupport.deleteAll(Scene.class);
+					DataSupport.deleteAll(Operation.class);
+					DataSupport.deleteAll(Post.class);
+					DataSupport.deleteAll(Signature.class);
+					DataSupport.deleteAll(Task.class);
+					DataSupport.deleteAll(User.class);
+					DataSupport.deleteAll(Rw.class);
+					DataSupport.deleteAll(RwRelation.class);
+					DataSupport.deleteAll(Diagram.class);
+					DataSupport.deleteAll(Mmc.class);
+					DataSupport.deleteAll(Product.class);
+					DataSupport.deleteAll(UploadFileRecord.class);
+					File v2pFile = new File(Environment.getExternalStorageDirectory() + Config.rootPath);
+					File mmcFile = new File(Environment.getExternalStorageDirectory() + Config.mmcPath);
+					deleteFiles(v2pFile);
+					deleteFiles(mmcFile);
+					message.what = 1;
+					mHandler.sendMessage(message);
+				}catch (Exception e) {
+					Log.e("clear database",e.toString());
+				}
+			}
+		}).start();
+	}
 }

@@ -41,7 +41,8 @@
             android:layout_alignParentLeft="false"
             android:layout_centerVertical="true"
             android:background="@drawable/delete_new"
-            android:focusable="false" />
+            android:focusable="false"
+            android:visibility="gone"/>
 
         <Button
             android:id="@+id/fragmentUnupload_back_button"
@@ -64,7 +65,7 @@
             android:layout_height="30dp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
-            android:layout_alignParentLeft="false"
+            android:layout_alignParentRight="true"
             android:layout_toLeftOf="@+id/fragmentupload_look_deletebutton"
             android:background="@drawable/chakan_new"
             android:focusable="false"/>

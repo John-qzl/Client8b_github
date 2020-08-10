@@ -582,7 +582,10 @@ public class FragmentCheck extends Fragment {
 		final View view = factory.inflate(R.layout.editbox_layout, null);//这里必须是final的
 		final EditText edit = (EditText) view.findViewById(R.id.editText);//获得输入框对象
 		final String[] nodeName = {""};
-		edit.setText(taskList.get(0).getTaskname());
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
+		Date curDate = new Date(System.currentTimeMillis());//获取当前时间
+		String timeString = formatter.format(curDate);
+		edit.setText(taskList.get(0).getTaskname() + timeString);
 		new AlertDialog.Builder(getActivity())
 				.setTitle("请输入新表单名称！")//提示框标题
 				.setView(view)
@@ -642,6 +645,7 @@ public class FragmentCheck extends Fragment {
 //			taskNew.setChbh("");
 //		}
 		taskNew.setTempid(task.getTempid());
+		taskNew.setTempType(task.getTempType());
 		taskNew.setPath(task.getPath());
 		taskNew.setPathId(task.getPathId());
 		taskNew.setChbh(task.getChbh());

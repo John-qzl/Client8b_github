@@ -21,7 +21,8 @@ public class Config{
 //	public static String packagePath = "/activity";			//包路径
 	public static String signphotoPath = "/8b/files/signphoto";			//检查表格签署照片路径
 	public static String opphotoPath = "/8b/files/opphoto";					//操作项示意图照片路径
-	
+	public static String personalsignphoto = "/8b/files/personalsignphoto";			//电子签章签署照片路径
+
 	public static String v2photoPath = "/8b/files/v2p";					//操作项拍照文件夹
 	public static String mmcPath = "/mmccopy";					//操作项拍照文件夹
 	public static String rootPath = "/8b/files";					//操作项拍照文件夹
@@ -31,8 +32,10 @@ public class Config{
 	public static String lower = "lower";//下偏差
 	public static String actualval = "actualval";//实测值
 	public static String compliance = "compliance";//符合度
-	public static String fuhe = "合格";//符合度
-	public static String bufuhe = "不合格";//符合度
+	public static String hege = "合格";//符合度
+	public static String buhege = "不合格";//符合度
+	public static String ystg = "验收通过";//验收通过
+	public static String ysbtg = "验收不通过";//验收不通过
 
 	public String getIpAndPort(Context context)
 	{

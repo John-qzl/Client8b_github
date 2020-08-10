@@ -4,7 +4,7 @@
     <dbname value="weather" >
     </dbname>
 
-    <version value="30" >
+    <version value="34" >
     </version>
 
     <list>
@@ -49,6 +49,9 @@
         </mapping>
 
         <mapping class="com.example.navigationdrawertest.model.Rows" >
+        </mapping>
+
+        <mapping class="com.example.navigationdrawertest.model.SignPhoto" >
         </mapping>
     </list>
 

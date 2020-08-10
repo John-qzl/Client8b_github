@@ -33,4 +33,7 @@
     <dimen name="size14">14dp</dimen>
     <dimen name="size12">12dp</dimen>
     <dimen name="size16">16dp</dimen>
+
+    <dimen name="three_grid_unit">24dp</dimen>
+    <dimen name="one_and_a_half_grid_unit">12dp</dimen>
 </resources>

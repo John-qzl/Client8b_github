@@ -6,8 +6,8 @@
 
     
     <uses-sdk
-        android:minSdkVersion="17"
-        android:targetSdkVersion="22" />
+        android:minSdkVersion="21"
+        android:targetSdkVersion="25" />
     <uses-permission android:name="android.permession.MOUNT_UNMOUNT_FILESYSTEMS"/>    
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />	
 	<uses-permission android:name="android.permission.INTERNET" />
@@ -159,6 +159,9 @@
             android:screenOrientation="landscape" />
         <activity
             android:name=".camera1.video.PreviewActivity"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name=".activity.SignPhotoCollectActivity"
             android:screenOrientation="landscape" />
         
         <receiver android:name="com.example.navigationdrawertest.Broadcast.BootBroadcastReceiver"> 

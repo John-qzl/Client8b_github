@@ -60,6 +60,15 @@ public class Task extends DataSupport{
 	private String cpId;			//产品ID
 	private String xhName;			//型号名称
 	private String xhId;			//型号ID
+	private String tempType;			//模板类型tempType
+
+	public String getTempType() {
+		return tempType;
+	}
+
+	public void setTempType(String tempType) {
+		this.tempType = tempType;
+	}
 
 	public String getTempid() {
 		return tempid;

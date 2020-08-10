@@ -151,20 +151,17 @@ public class SignAdapter1 extends BaseAdapter{
 	public void setLocation(Signature sign) {
 		int sumcount = 0; // 总共多少个签署项
 		int finishcount = 0; // 已经完成多少个签署项
-		List<Signature> signs = DataSupport.where("taskid = ?",
-				sign.getTaskid()).find(Signature.class);
-		Task task = DataSupport.where("taskid = ?", sign.getTaskid())
-				.find(Task.class).get(0);
+		List<Signature> signs = DataSupport.where("taskid = ?", sign.getTaskid()).find(Signature.class);
+		Task task = DataSupport.where("taskid = ?", sign.getTaskid()).find(Task.class).get(0);
 		sumcount = signs.size();
 		for (int i = 0; i < signs.size(); i++) {
-			if (signs.get(i).getIsFinish() != null
-					&& signs.get(i).getIsFinish().equals("is")) {
+			if (signs.get(i).getIsFinish() != null && signs.get(i).getIsFinish().equals("is")) {
 				finishcount++;
 			}
 		}
 		if (sumcount == finishcount) { // 全部签署完成
-			task.setLocation(3);
-			task.update(task.getId());
+//			task.setLocation(3);
+//			task.update(task.getId());
 		} else if (sumcount > finishcount && finishcount > 0) { // 签署了一部分
 			task.setLocation(2);
 			task.update(task.getId());

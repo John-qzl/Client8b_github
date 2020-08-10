@@ -62,7 +62,7 @@ public class ConditionAdapter extends ArrayAdapter<Scene>{
 		if(scenevalue != null){
 			viewHolder.inputvalue.setText(scenevalue);
 		}
-		viewHolder.image.setImageResource(R.drawable.arrow);
+		viewHolder.image.setImageResource(R.drawable.arrowselect);
 		viewHolder.displayname.setText(scene.getConditionname());
 		viewHolder.inputvalue.addTextChangedListener(new TextWatcher() {  
 	        @Override    

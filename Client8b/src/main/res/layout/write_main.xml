@@ -15,17 +15,20 @@
         android:text="@string/write_signname"
         android:layout_marginLeft="10dp"/>
     
-    <Button  
+	<Button
 		android:id="@+id/button_sign"
-		android:layout_width="80dp"
-		android:layout_height="30dp"
+		android:layout_width="74dp"
+		android:layout_height="32dp"
 		android:layout_marginLeft="5dp"
 		android:layout_marginRight="5dp"
+		android:paddingLeft="8dp"
 		android:layout_gravity="center"
-		android:background="@drawable/sign_new"
+		android:background="@drawable/sign_shape"
 		android:focusable="false"
-		android:textSize="22dp"
-		android:textColor="@color/White"/>
+		android:textSize="@dimen/size14"
+		android:textColor="@color/White"
+		android:text="签署"
+		android:drawableLeft="@drawable/sign"/>
     
  	<ImageButton
 		android:id="@+id/signimage"

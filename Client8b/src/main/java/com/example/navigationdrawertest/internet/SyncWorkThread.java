@@ -1070,6 +1070,7 @@ public class SyncWorkThread extends Thread {
 		task.setXhName(root.getAttribute("xhmc"));  //型号代号
 		task.setXhName(root.getAttribute("xhmc"));  //型号名称
 		task.setTempid(root.getAttribute("tempId"));  //模板ID
+		task.setTempType(root.getAttribute("tempType"));  //模板类型
 		task.setRwname(root.getAttribute("rwname"));
 		task.setPostname(root.getAttribute("postname"));
 		task.setPostinstanceid(root.getAttribute("postinstanceid"));
