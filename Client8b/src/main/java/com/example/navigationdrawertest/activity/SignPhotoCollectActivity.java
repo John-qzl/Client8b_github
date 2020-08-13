@@ -1,31 +1,45 @@
 package com.example.navigationdrawertest.activity;
 
+import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
+import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Message;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.example.navigationdrawertest.CustomUI.ObservableScrollView;
 import com.example.navigationdrawertest.R;
-import com.example.navigationdrawertest.adapter.SignPhotoAdapter;
+import com.example.navigationdrawertest.adapter.Event;
 import com.example.navigationdrawertest.application.OrientApplication;
 import com.example.navigationdrawertest.data.AerospaceDB;
+import com.example.navigationdrawertest.model.Cell;
+import com.example.navigationdrawertest.model.Operation;
+import com.example.navigationdrawertest.model.Rw;
+import com.example.navigationdrawertest.model.Scene;
 import com.example.navigationdrawertest.model.SignPhoto;
 import com.example.navigationdrawertest.model.Signature;
 import com.example.navigationdrawertest.model.Task;
+import com.example.navigationdrawertest.utils.ActivityUtil;
+import com.example.navigationdrawertest.utils.BitmapUtil;
+import com.example.navigationdrawertest.utils.CommonTools;
 import com.example.navigationdrawertest.utils.Config;
 import com.example.navigationdrawertest.utils.DateUtil;
 import com.example.navigationdrawertest.write.DialogListener;
+import com.example.navigationdrawertest.write.WriteButtonClick;
 import com.example.navigationdrawertest.write.WritePadDialog;
 
 import org.litepal.crud.DataSupport;
@@ -39,35 +53,44 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import de.greenrobot.event.EventBus;
+
 /**
  * Created by user on 2020/8/8.
  */
 
-public class SignPhotoCollectActivity extends BaseActivity  implements ObservableScrollView.Callbacks{
+public class SignPhotoCollectActivity extends BaseActivity{
     private LinearLayout mBack, mPhotoAdd;
-    private SignPhotoAdapter signPhotoAdapter = null;
+    private SignPhotoAdapter signPhotoAdapter;
     private ListView listView;
-    private AerospaceDB aerospacedb;
     private List<SignPhoto> signlists = new ArrayList<SignPhoto>();
     private Bitmap mSignBitmap;
     private String signPath;
     int windowHeight;
     int windowWidth;
 
+    private boolean isopen =true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signphoto_collect);
         getActionBar().hide();
-        initView();
         DisplayMetrics dm = new DisplayMetrics();
         this.getWindowManager().getDefaultDisplay().getMetrics(dm);
         windowWidth = dm.widthPixels;// 获取屏幕分辨率宽度
         windowHeight = dm.heightPixels;
-        aerospacedb = new AerospaceDB();
-//        loadSignAdapter(OrientApplication.getApplication().loginUser.getUserid());
-        signPhotoAdapter = new SignPhotoAdapter(SignPhotoCollectActivity.this);
+
+        initView();
+        loadSignAdapter(OrientApplication.getApplication().loginUser.getUserid());
+        signPhotoAdapter = new SignPhotoAdapter(SignPhotoCollectActivity.this, signlists);
         listView.setAdapter(signPhotoAdapter);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        refreshData();
     }
 
     private void initView() {
@@ -83,12 +106,14 @@ public class SignPhotoCollectActivity extends BaseActivity  implements Observabl
             @Override
             public void onClick(View v) {
                 addSignPhoto();
-//                loadSignAdapter(OrientApplication.getApplication().loginUser.getUserid());
-                signPhotoAdapter.notifyDataSetChanged();
-                listView.setAdapter(signPhotoAdapter);
             }
         });
         listView = (ListView) findViewById(R.id.signCollect_list);
+    }
+
+    private void refreshData() {
+        loadSignAdapter(OrientApplication.getApplication().loginUser.getUserid());
+        signPhotoAdapter.notifyDataSetChanged();
     }
 
     public void addSignPhoto() {
@@ -117,11 +142,10 @@ public class SignPhotoCollectActivity extends BaseActivity  implements Observabl
                                 signPhoto.setTime(timeString);
                                 signPhoto.setCreateUserId(creatorID);
                                 signDialog(signPhoto,signnature);
-                                signPhotoAdapter.notifyDataSetChanged();
-                                listView.setAdapter(signPhotoAdapter);
                             }
                         })
                 .setNegativeButton("取消", null).create().show();
+
     }
 
     public void signDialog(final SignPhoto signPhoto, Signature signnature) {
@@ -138,9 +162,9 @@ public class SignPhotoCollectActivity extends BaseActivity  implements Observabl
                     signPhoto.setBitmapPath(signPath);
                     signPhoto.save();
                 }
-//                mPhotoAdd.setEnabled(false);
-                signPhotoAdapter.notifyDataSetChanged();
-                listView.setAdapter(signPhotoAdapter);
+                finish();
+                Intent intent = new Intent(SignPhotoCollectActivity.this, SignPhotoCollectActivity.class);
+                startActivity(intent);
             }
         }, signnature);
         writeTabletDialog.show();
@@ -204,25 +228,99 @@ public class SignPhotoCollectActivity extends BaseActivity  implements Observabl
     protected void onDestroy() {
         super.onDestroy();
     }
-//
-//    //加载Sign数据
-//    private void loadSignAdapter(String userid){
-//        List<SignPhoto> signs = DataSupport.findAll(SignPhoto.class);
-//        signlists = signs;
-//    }
 
-    @Override
-    public void onScrollChanged(int scrollY) {
-
+    //加载Sign数据
+    private void loadSignAdapter(String userid){
+        List<SignPhoto> signs = DataSupport.findAll(SignPhoto.class);
+        signlists = signs;
     }
 
-    @Override
-    public void onDownMotionEvent() {
+    class SignPhotoAdapter  extends BaseAdapter {
+        private Context context;
+        /** 布局填充器 */
+        private LayoutInflater layoutInflater;
+        private List<SignPhoto> signPhotoList;
+        private String activityName;
+        int windowHeight;
+        int windowWidth;
 
-    }
+        public SignPhotoAdapter(Context context, List<SignPhoto> signPhotoList){
+            this.context = context;
+            this.signPhotoList = signPhotoList;
+            activityName = ActivityUtil.getActivityName(context);
+            layoutInflater = LayoutInflater.from(context);
+        }
 
-    @Override
-    public void onUpOrCancelMotionEvent() {
+        @Override
+        public int getCount() {
+            return signPhotoList.size();
+        }
 
+        @Override
+        public Object getItem(int position) {
+            return signPhotoList.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            SignPhotoAdapter.ViewHolder viewHolder;
+            final SignPhoto signPhoto = (SignPhoto) getItem(position);
+            if (convertView == null) {
+                convertView = LayoutInflater.from(context).inflate(R.layout.item_signphoto, null);
+                viewHolder = new ViewHolder();
+                viewHolder.signname = (TextView) convertView.findViewById(R.id.signphotoname);
+                viewHolder.signimage = (ImageButton) convertView.findViewById(R.id.signphotoimage);
+                viewHolder.signID = (TextView) convertView.findViewById(R.id.signphotoID);
+                viewHolder.signPhoto_del = (LinearLayout) convertView.findViewById(R.id.signPhoto_del);
+                viewHolder.signPhoto_del.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Dialog alertDialog = new AlertDialog.Builder(context).
+                                setTitle("确定删除？").
+                                setMessage("您确定删除该条签名吗？").
+                                setIcon(R.drawable.logo_title).
+                                setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        String signtoryId = signPhoto.getSigntoryId()+"";
+                                        DataSupport.deleteAll(SignPhoto.class, "signtoryId = ?", signtoryId);
+                                        finish();
+                                        Intent intent = new Intent(SignPhotoCollectActivity.this, SignPhotoCollectActivity.class);
+                                        startActivity(intent);
+                                    }
+                                }).
+                                setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                }).
+                                create();
+                        alertDialog.show();
+                    }
+                });
+                convertView.setTag(viewHolder);
+            } else {
+                viewHolder = (ViewHolder) convertView.getTag();
+            }
+            viewHolder.signname.setText(signPhoto.getSigntoryName());
+            viewHolder.signID.setText(signPhoto.getSigntoryId());
+            String _path = CommonTools.null2String(signPhoto.getBitmapPath());
+            Bitmap bitmap = BitmapUtil.getLoacalBitmap(_path);
+            viewHolder.signimage.setImageBitmap(bitmap);
+            return convertView;
+        }
+
+        class ViewHolder {
+            public TextView signname;
+            public ImageButton signimage;
+            public TextView signID;
+            public LinearLayout signPhoto_del;
+        }
     }
 }

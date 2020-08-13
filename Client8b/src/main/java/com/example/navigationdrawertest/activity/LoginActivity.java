@@ -78,6 +78,7 @@ import com.example.navigationdrawertest.model.Product;
 import com.example.navigationdrawertest.model.Rw;
 import com.example.navigationdrawertest.model.RwRelation;
 import com.example.navigationdrawertest.model.Scene;
+import com.example.navigationdrawertest.model.SignPhoto;
 import com.example.navigationdrawertest.model.Signature;
 import com.example.navigationdrawertest.model.Task;
 import com.example.navigationdrawertest.model.UploadFileRecord;
@@ -819,6 +820,7 @@ public class LoginActivity extends BaseActivity{
 					DataSupport.deleteAll(Mmc.class);
 					DataSupport.deleteAll(Product.class);
 					DataSupport.deleteAll(UploadFileRecord.class);
+					DataSupport.deleteAll(SignPhoto.class);
 					File v2pFile = new File(Environment.getExternalStorageDirectory() + Config.rootPath);
 					File mmcFile = new File(Environment.getExternalStorageDirectory() + Config.mmcPath);
 					deleteFiles(v2pFile);

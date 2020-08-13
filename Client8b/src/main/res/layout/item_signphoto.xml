@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="80dp"
-    android:orientation="horizontal" >
+    android:orientation="horizontal"
+    android:gravity="center_vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -43,29 +44,26 @@
         android:gravity="center"
         android:layout_weight="1">
 
-        <!--<Button-->
-            <!--android:id="@+id/button_signphoto"-->
-            <!--android:layout_width="74dp"-->
-            <!--android:layout_height="32dp"-->
-            <!--android:layout_marginLeft="5dp"-->
-            <!--android:layout_marginRight="5dp"-->
-            <!--android:paddingLeft="8dp"-->
-            <!--android:layout_gravity="center"-->
-            <!--android:background="@drawable/sign_shape"-->
-            <!--android:focusable="false"-->
-            <!--android:textSize="@dimen/size14"-->
-            <!--android:textColor="@color/White"-->
-            <!--android:text="签署"-->
-            <!--android:drawableLeft="@drawable/sign"/>-->
-
         <ImageButton
             android:id="@+id/signphotoimage"
-            android:layout_width="wrap_content"
+            android:layout_width="120dp"
             android:layout_height="80dp"
-            android:layout_marginLeft="15dp"
             android:layout_gravity="center"
             android:background="#d5d5d5"
             android:scaleType="fitXY"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/signPhoto_del"
+        android:layout_width="50dp"
+        android:layout_height="match_parent"
+        android:gravity="center">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/icon_delete"
+            android:layout_marginRight="10dp"/>
     </LinearLayout>
 
 </LinearLayout>

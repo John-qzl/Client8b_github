@@ -9,11 +9,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
-import java.io.Writer;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -35,12 +31,9 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.AbstractHttpEntity;
-import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.ContentBody;
 import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.litepal.crud.DataSupport;
@@ -49,10 +42,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -60,17 +51,11 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.Settings;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
-import com.example.navigationdrawertest.CustomUI.CellTypeEnum;
 import com.example.navigationdrawertest.CustomUI.CellTypeEnum1;
 import com.example.navigationdrawertest.activity.LoginActivity;
-import com.example.navigationdrawertest.adapter.SignAdapter1;
-import com.example.navigationdrawertest.application.MyApplication;
 import com.example.navigationdrawertest.application.OrientApplication;
 import com.example.navigationdrawertest.data.AerospaceDB;
 import com.example.navigationdrawertest.fragment.FragmentCheck;
@@ -82,22 +67,18 @@ import com.example.navigationdrawertest.model.Rows;
 import com.example.navigationdrawertest.model.Rw;
 import com.example.navigationdrawertest.model.RwRelation;
 import com.example.navigationdrawertest.model.Scene;
+import com.example.navigationdrawertest.model.SignPhoto;
 import com.example.navigationdrawertest.model.Signature;
 import com.example.navigationdrawertest.model.Task;
 import com.example.navigationdrawertest.model.UploadFileRecord;
 import com.example.navigationdrawertest.model.User;
-import com.example.navigationdrawertest.secret.FileEncryption;
 import com.example.navigationdrawertest.utils.CalculateUtil;
 import com.example.navigationdrawertest.utils.CommonTools;
 import com.example.navigationdrawertest.utils.CommonUtil;
 import com.example.navigationdrawertest.utils.Config;
 import com.example.navigationdrawertest.utils.ConverXML;
-import com.example.navigationdrawertest.utils.DateUtil;
 import com.example.navigationdrawertest.utils.FileOperation;
 import com.example.navigationdrawertest.utils.Setting;
-
-import static android.content.Context.TELEPHONY_SERVICE;
-import static com.example.navigationdrawertest.customCamera.album.view.FilterImageView.TAG;
 
 /**
  * @author liu 2015-10-17 下午1:58:54
@@ -135,6 +116,9 @@ public class SyncWorkThread extends Thread {
 
 		//上传设备信息
 		upLoadDeviceInfo("1");
+
+		//上传电子签章
+		uploadPersonalSignPhoto();
 		// 4,上传待上传XML
 		boolean flag = uploadTable();
 		if(!flag){				//错误信息
@@ -2595,7 +2579,7 @@ public class SyncWorkThread extends Thread {
 		// 1,找到该任务照片目录
 		String userId = OrientApplication.getApplication().loginUser
 				.getUserid();
-		String signphotoPath = Environment.getDataDirectory().getPath()
+		String signphotoPath = Environment.getExternalStorageDirectory()
 				+ Config.packagePath + Config.signphotoPath 
 				+ "/" + taskId + "/";
 		String photoName = "";
@@ -2663,6 +2647,51 @@ public class SyncWorkThread extends Thread {
 
 		}
 		return true;
+	}
+
+	/**
+	 * @Description: 上传电子签章
+	 * @author qiaozhili
+	 * @date 2020/8/11 17:38
+	 * @param
+	 * @return
+	 */
+	public void uploadPersonalSignPhoto() {
+		List<SignPhoto> signPhotos = DataSupport.findAll(SignPhoto.class);
+		if (signPhotos.size() > 0) {
+			for (SignPhoto signphoto : signPhotos) {
+				String signphotoPath = Environment.getExternalStorageDirectory()
+						+ Config.personalsignphoto 	+ "/" + signphoto.getSigntoryId() + ".jpg";
+				HttpClient client = HttpClientHelper.getOrientHttpClient();
+				String str = "http://"
+						+ OrientApplication.getApplication().setting.IPAdress
+						+ ":"
+						+ OrientApplication.getApplication().setting.PortAdress
+						+ "/dp/datasync/sync.do?operationType=uploadpersonalsignphoto&username="
+						+ signphoto.getSigntoryName() + "&userid=" + signphoto.getSigntoryId();
+				HttpPost postmethod = null;
+				try {
+					postmethod = new HttpPost(str);
+
+					File file = new File(signphotoPath);
+					MultipartEntity mpEntity = new MultipartEntity(); // 文件传输
+					ContentBody cbFile = new FileBody(file);
+					mpEntity.addPart("userfile", cbFile);
+					postmethod.setEntity(mpEntity);
+
+					HttpResponse response = client.execute(postmethod);
+
+					int code = response.getStatusLine().getStatusCode();
+					if (code != 200) {
+						errorMessage = "上传" + signphoto.getSigntoryId() + "的电子签章任务错误";
+					} else {
+//						DataSupport.deleteAll(SignPhoto.class, "signtoryId=?", signphoto.getSigntoryId());
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 
 	public static List<String> GetFiles(String Path, String Extension) // 搜索目录，扩展名，是否进入子文件夹

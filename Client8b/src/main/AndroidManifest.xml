@@ -163,8 +163,8 @@
         <activity
             android:name=".activity.SignPhotoCollectActivity"
             android:screenOrientation="landscape" />
-        
-        <receiver android:name="com.example.navigationdrawertest.Broadcast.BootBroadcastReceiver"> 
+
+        <receiver android:name="com.example.navigationdrawertest.Broadcast.BootBroadcastReceiver">
 			<intent-filter> 
 			<action android:name="android.intent.action.BOOT_COMPLETED" /> 
 			<category android:name="android.intent.category.HOME" />
