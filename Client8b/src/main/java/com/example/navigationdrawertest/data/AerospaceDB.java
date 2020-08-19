@@ -273,7 +273,7 @@ public class AerospaceDB {
 	 * 删除数据库
 	 */
 	public int deleteAllUsers(){
-		return DataSupport.deleteAll(User.class);
+		return DataSupport.deleteAll(User.class,"isAdmin = ?", "0");
 	}
 	
 	

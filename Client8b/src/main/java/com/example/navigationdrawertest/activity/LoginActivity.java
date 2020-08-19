@@ -318,7 +318,12 @@ public class LoginActivity extends BaseActivity{
 //								MainActivity.actionStart(LoginActivity.this);
 								if (DataSupport.findAll(User.class).size() > 0) {
 									Intent intent = new Intent(LoginActivity.this, MainActivity1.class);
-									startActivity(intent);
+									Intent intent1 = new Intent(LoginActivity.this, AdminActivity.class);
+									if (username.getText().toString().equals("admin")) {
+										startActivity(intent1);
+									} else {
+										startActivity(intent);
+									}
 								} else {
 									Toast.makeText(LoginActivity.this, "没查询到用户信息，请检查服务端数据！", Toast.LENGTH_SHORT).show();
 								}
@@ -577,9 +582,14 @@ public class LoginActivity extends BaseActivity{
 				OrientApplication.getApplication().loginUser = user;
 				curUser.setLoginFailureTimes(0);
 				curUser.save();
-//				MainActivity.actionStart(LoginActivity.this); 
-				Intent intent = new Intent(this, MainActivity1.class);
-	        	startActivity(intent);
+//				MainActivity.actionStart(LoginActivity.this);
+                Intent intent = new Intent(this, MainActivity1.class);
+                Intent intent1 = new Intent(this, AdminActivity.class);
+                if (username.equals("admin")) {
+                    startActivity(intent1);
+                } else {
+                    startActivity(intent);
+                }
 	        	finish();
 			}
 		}
@@ -813,7 +823,7 @@ public class LoginActivity extends BaseActivity{
 					DataSupport.deleteAll(Post.class);
 					DataSupport.deleteAll(Signature.class);
 					DataSupport.deleteAll(Task.class);
-					DataSupport.deleteAll(User.class);
+					DataSupport.deleteAll(User.class,"isAdmin = ?", "0");
 					DataSupport.deleteAll(Rw.class);
 					DataSupport.deleteAll(RwRelation.class);
 					DataSupport.deleteAll(Diagram.class);

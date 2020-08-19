@@ -1034,6 +1034,7 @@ public class SyncWorkThread extends Thread {
 
 
 	private Task readTask(Element root, Task task, String state, Map<String, String> map) {
+		String id = Settings.System.getString(context.getContentResolver(), Settings.System.ANDROID_ID);
 		if (state.equals("finish")) { // 已完成状态
 			task.setLocation(4);
 		} else { // 未完成状态
@@ -1065,7 +1066,7 @@ public class SyncWorkThread extends Thread {
 		task.setEndTime(root.getAttribute("endtime"));
 		task.setIsfinish("false"); 						// 2016-4-15 表格是否完成标记
 		task.setInitStatue("unfinish");			// 2016-7-29 09:40:27
-
+		task.setDeviceCode(id);
 //		task.setTablesize(root.getAttribute("tablesize"));	//表格拆分标记
 
 		readRw(root); // 保存任务--岗位--表格关系表
@@ -1633,7 +1634,7 @@ public class SyncWorkThread extends Thread {
 
 	private boolean downloadUsers() {
 		// 0.需要先删除所有的人员信息
-		DataSupport.deleteAll(User.class);
+		DataSupport.deleteAll(User.class,"isAdmin = ?", "0");
 		// 1.重新下载所有的人员信息
 		HttpClient client = HttpClientHelper.getOrientHttpClient();
 		HttpPost postmethod = new HttpPost(HttpClientHelper.getURL());
@@ -1688,18 +1689,36 @@ public class SyncWorkThread extends Thread {
 			NodeList nodelist = root.getElementsByTagName("user");
 			for (int index = 0; index < nodelist.getLength(); index++) {
 				Element userElement = (Element) nodelist.item(index);
-				User user = new User();
-				user.setUserid(userElement.getAttribute("id"));
-				user.setUsername(userElement.getAttribute("username"));
-				user.setPassword(userElement.getAttribute("password"));
-				user.setDisplayname(userElement.getAttribute("displayname"));
-				user.setTtidandname(userElement.getAttribute("ttidandname"));
-				user.setCommanderId(userElement.getAttribute("commanderId"));
+				String userName = userElement.getAttribute("username");
+				String userId = userElement.getAttribute("id");
+				List<User> users = new ArrayList<>();
+				String isAdmin = "";
+				User user = null;
 				// user.setLiangzong(userElement.getAttribute("liangzong"));
 				// user.setPostsString(userElement.getAttribute("post"));
 				// if(user.save()){
 				// Log.i("AllUsers", user.getUsername());
 				// }
+				if (!userId.equals("") && userId != null) {
+					users = DataSupport.where("userid = ?", userId).find(User.class);
+				}
+				if (users.size() > 0) {//更新
+					user = users.get(0);
+				} else {//新增
+					user = new User();
+					user.setUserid(userId);
+				}
+				user.setUsername(userName);
+				user.setPassword(userElement.getAttribute("password"));
+				user.setDisplayname(userElement.getAttribute("displayname"));
+				user.setTtidandname(userElement.getAttribute("ttidandname"));
+				user.setCommanderId(userElement.getAttribute("commanderId"));
+				if (!userName.equals("admin")) {
+					isAdmin = "0";
+				} else {
+					isAdmin = "1";
+				}
+				user.setIsAdmin(isAdmin);
 				if (aerospacedb.saveUser(user)) {
 					Log.i("AllUsers", user.getUsername());
 				}
@@ -1756,8 +1775,7 @@ public class SyncWorkThread extends Thread {
 				nameValuePairs.add(new BasicNameValuePair("htmlContent", html));
 				nameValuePairs.add(new BasicNameValuePair("tempId", task.getTempid()));
 				nameValuePairs.add(new BasicNameValuePair("planId", task.getChId()));
-				postmethod.setEntity(new UrlEncodedFormEntity(nameValuePairs,
-						"utf-8"));
+				postmethod.setEntity(new UrlEncodedFormEntity(nameValuePairs, "utf-8"));
 				Log.i("setEntity", task.getTaskname() + "OK");
 				postmethod.setHeader("Content-Type",
 						"application/x-www-form-urlencoded; charset=utf-8");
@@ -2579,7 +2597,7 @@ public class SyncWorkThread extends Thread {
 		// 1,找到该任务照片目录
 		String userId = OrientApplication.getApplication().loginUser
 				.getUserid();
-		String signphotoPath = Environment.getExternalStorageDirectory()
+		String signphotoPath = Environment.getDataDirectory().getPath()
 				+ Config.packagePath + Config.signphotoPath 
 				+ "/" + taskId + "/";
 		String photoName = "";

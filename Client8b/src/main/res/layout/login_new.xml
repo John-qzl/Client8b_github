@@ -133,13 +133,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/setting_select"
-                android:src="@drawable/delete_data" />
+                android:src="@drawable/delete_data"
+                android:visibility="gone"/>
 
             <ImageButton
                 android:id="@+id/shezhi"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="15dp"
                 android:background="@drawable/setting_select"
                 android:src="@drawable/setting1" />
         </LinearLayout>

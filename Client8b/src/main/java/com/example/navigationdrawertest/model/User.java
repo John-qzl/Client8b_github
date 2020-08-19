@@ -14,6 +14,16 @@ public class User extends DataSupport{
 	private String password;
 	private String displayname;
 	private int loginFailureTimes;
+	private String isAdmin;//是否是管理员：1是，0否
+
+	public String getIsAdmin() {
+		return isAdmin;
+	}
+
+	public void setIsAdmin(String isAdmin) {
+		this.isAdmin = isAdmin;
+	}
+
 	//2016-3-15 13:56:34
 	private String ttidandname;			//工作队的ID和NAME（id,name;id,name）
 	

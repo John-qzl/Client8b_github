@@ -114,7 +114,6 @@ public class MainActivity1 extends FragmentActivity implements OnItemClickListen
     public static void actionStart1(Context context) {
         Intent intent = new Intent(context, MainActivity1.class);
         context.startActivity(intent);
-
     }
 
     @Override

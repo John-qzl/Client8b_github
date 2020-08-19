@@ -655,6 +655,7 @@ public class FragmentCheck extends Fragment {
 		taskNew.setXhId(task.getXhId());
 		taskNew.setXhName(task.getXhName());
 		taskNew.setTaskname(nodeName);
+		taskNew.setDeviceCode(task.getDeviceCode());
 		taskNew.setRemark(task.getRemark());
 		taskNew.setVersion(task.getVersion());
 		taskNew.setLocation(task.getLocation());

@@ -99,7 +99,7 @@
             android:layout_weight="1"
             android:layout_marginLeft="15dp"
             android:textSize="@dimen/size14"
-            android:text="人员账号"
+            android:text="人员工号"
             android:textColor="@color/text_color"/>
         <TextView
             android:layout_width="wrap_content"

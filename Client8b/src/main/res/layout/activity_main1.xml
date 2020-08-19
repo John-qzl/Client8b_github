@@ -90,7 +90,8 @@
                 android:gravity="center_vertical"
                 android:layout_toLeftOf="@+id/data_syn"
                 android:orientation="horizontal"
-                android:layout_marginRight="15dp">
+                android:layout_marginRight="15dp"
+                android:visibility="gone">
 
                 <ImageView
                     android:layout_width="wrap_content"

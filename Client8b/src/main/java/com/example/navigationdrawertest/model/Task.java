@@ -61,6 +61,7 @@ public class Task extends DataSupport{
 	private String xhName;			//型号名称
 	private String xhId;			//型号ID
 	private String tempType;			//模板类型tempType
+	private String deviceCode;			//当前设备编号
 
 	public String getTempType() {
 		return tempType;
@@ -150,6 +151,14 @@ public class Task extends DataSupport{
 		IsBrother = isBrother;
 	}
 
+	public String getDeviceCode() {
+		return deviceCode;
+	}
+
+	public void setDeviceCode(String deviceCode) {
+		this.deviceCode = deviceCode;
+	}
+
 	public Map<String, String> getRownummap() {
 		return rownummap;
 	}
@@ -197,6 +206,7 @@ public class Task extends DataSupport{
 	public static String Attr_postinstanceid = "postinstanceid";
 	public static String Attr_starttime = "starttime";
 	public static String Attr_endtime = "endtime";
+	public static String Attr_deviceCode = "deviceCode";
 
 	public String getInitStatue() {
 		return initStatue;
@@ -352,6 +362,7 @@ public class Task extends DataSupport{
 		taskElement.setAttribute(Attr_postinstanceid, task.postinstanceid);
 		taskElement.setAttribute(Attr_starttime, task.startTime);	//
 		taskElement.setAttribute(Attr_endtime, task.endTime);
+		taskElement.setAttribute(Attr_deviceCode, task.deviceCode);
 
 //		if(task.location.equals("3")){		//在待上传中，location=3
 //			taskElement.setAttribute(Atti_isOK, "true");

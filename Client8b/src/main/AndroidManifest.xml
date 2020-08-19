@@ -163,6 +163,9 @@
         <activity
             android:name=".activity.SignPhotoCollectActivity"
             android:screenOrientation="landscape" />
+        <activity
+            android:name=".activity.AdminActivity"
+            android:screenOrientation="landscape" />
 
         <receiver android:name="com.example.navigationdrawertest.Broadcast.BootBroadcastReceiver">
 			<intent-filter> 
