@@ -2700,10 +2700,11 @@ public class SyncWorkThread extends Thread {
 					HttpResponse response = client.execute(postmethod);
 
 					int code = response.getStatusLine().getStatusCode();
-					if (code != 200) {
-						errorMessage = "上传" + signphoto.getSigntoryId() + "的电子签章任务错误";
+					String respon = EntityUtils.toString(response.getEntity(), "utf-8");
+					if (respon.contains("success")) {
+						DataSupport.deleteAll(SignPhoto.class, "signtoryId=?", signphoto.getSigntoryId());
 					} else {
-//						DataSupport.deleteAll(SignPhoto.class, "signtoryId=?", signphoto.getSigntoryId());
+						errorMessage = "上传" + signphoto.getSigntoryId() + "的电子签章任务错误";
 					}
 				} catch (IOException e) {
 					e.printStackTrace();

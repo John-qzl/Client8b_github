@@ -34,6 +34,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -42,6 +43,7 @@ import android.os.Message;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Gravity;
@@ -67,6 +69,7 @@ import com.example.navigationdrawertest.CustomUI.CustomDialog;
 import com.example.navigationdrawertest.application.MyApplication;
 import com.example.navigationdrawertest.application.OrientApplication;
 import com.example.navigationdrawertest.internet.SyncWorkThread;
+import com.example.navigationdrawertest.internet.UpdataVersionThread;
 import com.example.navigationdrawertest.login.Login;
 import com.example.navigationdrawertest.login.PasswordUtil;
 import com.example.navigationdrawertest.model.Cell;
@@ -99,7 +102,7 @@ public class LoginActivity extends BaseActivity{
 	private EditText username, password;
 	private ProgressDialog prodlg;
 	private boolean isClicked = false;
-	private ImageButton shezhiBtn, deletedataBtn;
+	private ImageButton shezhiBtn, deletedataBtn, update;
 	private Context context;
 	private AlertDialog.Builder dialog;
 	private TextView mVersion;
@@ -234,6 +237,37 @@ public class LoginActivity extends BaseActivity{
 			} else if (readResult != null && readResult.equalsIgnoreCase("OK"))// 读本地成功
 			{
 //				startMainTabIntent();
+			} else if (readResult != null && readResult.equalsIgnoreCase("disableUrl")) {
+				prodlg.dismiss();
+				AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+				dialog.setIcon(R.drawable.logo_title).setTitle("提示");
+				dialog.setMessage("IP和Port无效，请检查端口设置后重试！");
+				dialog.setCancelable(false);
+				dialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				});
+				dialog.show();
+			} else if (readResult != null && readResult.equalsIgnoreCase("okupdata")) {
+				prodlg.dismiss();
+				String apkpath = (String) bundle.get("apkpath");
+				String apkVersion = (String) bundle.get("apkVersion");
+				updataWarn(apkpath, apkVersion);
+			}else if (readResult != null && readResult.equalsIgnoreCase("noNewVersion")) {
+				prodlg.dismiss();
+				AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+				dialog.setIcon(R.drawable.logo_title).setTitle("提示");
+				dialog.setMessage("没有检测到新版本，请检查新版本是否存在！");
+				dialog.setCancelable(false);
+				dialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				});
+				dialog.show();
 			}
 			return;
 		}
@@ -352,6 +386,7 @@ public class LoginActivity extends BaseActivity{
 		username.setText(SharedPrefsUtil.getValue(this, "username", ""));
 		password = (EditText) findViewById(R.id.password);
 		shezhiBtn = (ImageButton) findViewById(R.id.shezhi);
+		update = (ImageButton) findViewById(R.id.update);
 		mVersion = (TextView) findViewById(R.id.tv_version);
 		context = this;
 		mVersion.setText("版本号：v"+packageName(context));
@@ -479,6 +514,12 @@ public class LoginActivity extends BaseActivity{
         			}
         		});
         		dialog.show();
+			}
+		});
+		update.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				checkInternet();
 			}
 		});
 	}
@@ -842,5 +883,92 @@ public class LoginActivity extends BaseActivity{
 				}
 			}
 		}).start();
+	}
+
+	/**
+	 * @Description: 检查网络连接
+	 * @author qiaozhili
+	 * @date 2020/3/20 17:12
+	 * @param
+	 * @return
+	 */
+	private void checkInternet() {
+		this.prodlg = ProgressDialog.show(this, "检测网络连接中", "请稍侯...");
+		prodlg.setIcon(this.getResources().getDrawable(
+				R.drawable.logo_title));
+		boolean bConnected = NetCheckTool.check(this);// 检测本地网络是否可连接服务
+		if (bConnected == true)	// 联网登录
+		{
+			prodlg.dismiss();
+			starUpdata();
+		}else{		//离线登录
+			alert("无网络连接！");
+			prodlg.cancel();
+		}
+	}
+
+	/**
+	 * @param
+	 * @return
+	 * @Description: 下载apk
+	 * @author qiaozhili
+	 * @date 2020/3/20 17:40
+	 */
+
+	private void starUpdata() {
+		this.prodlg = ProgressDialog.show(this, "版本更新", "正在更新版本");
+		prodlg.setIcon(this.getResources().getDrawable(R.drawable.logo_title));
+		UpdataVersionThread uptataThread = new UpdataVersionThread(this, handler);
+		uptataThread.start();
+	}
+
+	private void updataWarn(final String apkPath, String apkVersion) {
+		AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+		dialog.setIcon(R.drawable.logo_title).setTitle("检测到新版本，是否进行升级？");
+//		dialog.setMessage("version:" + apkVersion);
+		dialog.setCancelable(false);
+		dialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+				if (apkPath != "") {
+//					installAPK(apkPath);
+					install(apkPath);
+				} else {
+					Toast.makeText(LoginActivity.this, "没查询apk文件，请检查服务端数据！", Toast.LENGTH_SHORT).show();
+				}
+			}
+		});
+		dialog.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+			}
+		});
+		dialog.show();
+	}
+
+	private void install(String filePath) {
+		Log.i(TAG, "开始执行安装: " + filePath);
+		try {
+			File apkFile = new File(filePath);
+			Intent intent = new Intent(Intent.ACTION_VIEW);
+			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			if (Build.VERSION.SDK_INT >= 24) {
+				Log.w(TAG, "版本大于 N ，开始使用 fileProvider 进行安装");
+				intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+				Uri contentUri = FileProvider.getUriForFile(
+						context
+						, "com.example.navigationdrawer8bu.fileprovider"
+						, apkFile);
+				intent.setDataAndType(contentUri, "application/vnd.android.package-archive");
+			} else {
+				Log.w(TAG, "正常进行安装");
+				intent.setDataAndType(Uri.fromFile(apkFile), "application/vnd.android.package-archive");
+			}
+			startActivity(intent);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }

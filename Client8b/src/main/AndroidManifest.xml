@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.navigationdrawertest"
-    android:versionCode="1"
-    android:versionName="1.2" >
+    android:versionCode="121"
+    android:versionName="1.2.1" >
 
     
     <uses-sdk
@@ -172,7 +172,17 @@
 			<action android:name="android.intent.action.BOOT_COMPLETED" /> 
 			<category android:name="android.intent.category.HOME" />
 			</intent-filter> 
-		</receiver> 
+		</receiver>
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.example.navigationdrawer8bu.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
         
     </application>
 

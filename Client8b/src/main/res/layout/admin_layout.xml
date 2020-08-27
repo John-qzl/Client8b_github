@@ -31,6 +31,30 @@
             android:layout_marginLeft="8dp"/>
 
         <LinearLayout
+            android:id="@+id/data_syn"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:layout_toLeftOf="@+id/quit"
+            android:orientation="horizontal"
+            android:layout_marginRight="15dp">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/data_sync"
+                android:layout_marginRight="5dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="数据同步"
+                android:textSize="@dimen/size14"
+                android:textColor="@color/White" />
+
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/quit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
