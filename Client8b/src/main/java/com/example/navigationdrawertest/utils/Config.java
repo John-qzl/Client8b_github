@@ -37,6 +37,19 @@ public class Config{
 	public static String ystg = "验收通过";//验收通过
 	public static String ysbtg = "验收不通过";//验收不通过
 
+	//判读参数
+	public static String bmz = "不满足";//不满足
+	public static String bfh = "不符合";//不符合
+	public static String bn = "不能";//不能
+	public static String bzc = "不正常";//不正常
+	public static String bwz = "不完整";//不完整
+	public static String yqx = "有缺陷";//有缺陷
+	public static String cw = "错误";//错误
+	public static String ygs = "有干涉";//有干涉
+	public static String wqs = "未签署";//未签署
+	public static String wmq = "未明确";//未明确
+	public static String bhg = "不合格";//不合格
+
 	public String getIpAndPort(Context context)
 	{
 		try {

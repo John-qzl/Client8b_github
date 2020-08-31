@@ -2334,10 +2334,10 @@ public class CheckActivity1 extends BaseActivity implements ObservableScrollView
         Pattern r4 = Pattern.compile(pattern4);
         Matcher m4 = r4.matcher(actualvalNum);
         System.out.println(m4.matches());
-        if (!m4.matches()) {
-//			Toast.makeText(context, "实测值" + actualvalNum + "非纯数字，无法判读！", Toast.LENGTH_SHORT).show();
-            return;
-        }
+//        if (!m4.matches()) {
+////			Toast.makeText(context, "实测值" + actualvalNum + "非纯数字，无法判读！", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
         //包含≥/≤/＞/＜等的情况
         if (m.matches()) {
             if (!m4.matches()) {
@@ -2366,18 +2366,21 @@ public class CheckActivity1 extends BaseActivity implements ObservableScrollView
                 judgeResult(false, cell, operation2);
             }
         }
-//        //文字类型判读，判断是否包含“已”“未”
-//        else if (m1.find()) {
-//            if (!actualvalNum.equals("")) {
-//                if (actualvalNum.contains("已")) {
-//                    judgeResult(true, cell, operation2);
-//                } else {
-//                    judgeResult(false, cell, operation2);
-//                }
-//            } else {
-//                judgeResult(false, cell, operation2);
-//            }
-//        }
+        //文字类型判读，判断是否包含“已”“未”
+        else if (m1.find()) {
+            if (!actualvalNum.equals("")) {
+                if (actualvalNum.contains(Config.bmz) || actualvalNum.contains(Config.bfh) || actualvalNum.contains(Config.bn)
+                        || actualvalNum.contains(Config.bzc) || actualvalNum.contains(Config.bwz) || actualvalNum.contains(Config.yqx)
+                        || actualvalNum.contains(Config.cw) || actualvalNum.contains(Config.ygs) || actualvalNum.contains(Config.wqs)
+                        || actualvalNum.contains(Config.wmq) || actualvalNum.contains(Config.bhg)) {
+                    judgeResult(false, cell, operation2);
+                } else {
+                    judgeResult(true, cell, operation2);
+                }
+            } else {
+                judgeResult(false, cell, operation2);
+            }
+        }
         //5(+1, -1)、 5[+1, 0]；
         else if (m2.matches()) {
             if (!m4.matches()) {

@@ -671,19 +671,19 @@ public class SyncWorkThread extends Thread {
 					relationStr.append(rwRelation.getRwid()).append(",");
 				}
 				if (!relationStr.toString().contains(proId)) {
-					proRe.setRwid(proId);
-					proRe.setRwname(proName);
-					proRe.setProductid(productId);
-					proRe.setUserid(user.getUserid());
-					proRe.setUsername(user.getUsername());
+				}
+				proRe.setRwid(proId);
+				proRe.setRwname(proName);
+				proRe.setProductid(productId);
+				proRe.setUserid(user.getUserid());
+				proRe.setUsername(user.getUsername());
 //				if (!str1.equals("")) {
 //					proRe.setNodeId(str1);
 //				} else {
 //					proRe.setNodeId("");
 //				}
-					syncList.add(proRe.getRwid() + "---RwRelation表保存成功");
-					proRe.save();
-				}
+				syncList.add(proRe.getRwid() + "---RwRelation表保存成功");
+				proRe.save();
 			}
 		}
 		return true;
