@@ -543,7 +543,7 @@ public class CheckActivity1 extends BaseActivity implements ObservableScrollView
                         }
                         if (currentTask.getTempType().equals("1") && cell.getRowname().equals("结论") && !cell.getOpvalue().equals("")) {
                             if (checkConclusionByCell(cell.getOpvalue())) {
-                                edittext2.setBackgroundColor(getResources().getColor(R.color.White));
+                                edittext2.setBackgroundColor(getResources().getColor(R.color.gray));
                             } else {
                                 edittext2.setBackgroundColor(getResources().getColor(R.color.red));
                             }
@@ -576,7 +576,7 @@ public class CheckActivity1 extends BaseActivity implements ObservableScrollView
 //		    	            HtmlHelper.changeTextValue(htmlDoc, cell, operation2.getRealcellid());
                                 if (currentTask.getTempType().equals("1") && cell.getRowname().equals("结论") && !str.equals("")) {
                                     if (checkConclusionByCell(str)) {
-                                        edittext2.setBackgroundColor(getResources().getColor(R.color.White));
+                                        edittext2.setBackgroundColor(getResources().getColor(R.color.gray));
                                     } else {
                                         edittext2.setBackgroundColor(getResources().getColor(R.color.red));
                                     }
@@ -652,7 +652,7 @@ public class CheckActivity1 extends BaseActivity implements ObservableScrollView
                         image2.setBackgroundResource(R.drawable.blacktiao);
                         linear2.addView(image2, para2_2);
                         if ((currentTask.getTempType().equals("1") && cell.getRowname().equals("结论")) ||
-                                (currentTask.getTempType().equals("6")&& cell.getHorizontalorder().equals("1")) ) {
+                                (currentTask.getTempType().equals("6")&& cell.getHorizontalorder().equals("2")) ) {
                             if (str.equals("")) {
                                 if (currentTask.getTempType().equals("1")) {
                                     cell.setOpvalue(Config.hege);
