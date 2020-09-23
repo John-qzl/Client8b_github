@@ -351,7 +351,7 @@ public class LoginActivity extends BaseActivity{
 							public void onClick(DialogInterface dialog, int id) {
 //								MainActivity.actionStart(LoginActivity.this);
 								if (DataSupport.findAll(User.class).size() > 0) {
-									Intent intent = new Intent(LoginActivity.this, MainActivity1.class);
+									Intent intent = new Intent(LoginActivity.this, GateActivity.class);
 									Intent intent1 = new Intent(LoginActivity.this, AdminActivity.class);
 									if (username.getText().toString().equals("admin")) {
 										startActivity(intent1);
@@ -624,7 +624,7 @@ public class LoginActivity extends BaseActivity{
 				curUser.setLoginFailureTimes(0);
 				curUser.save();
 //				MainActivity.actionStart(LoginActivity.this);
-                Intent intent = new Intent(this, MainActivity1.class);
+                Intent intent = new Intent(this, GateActivity.class);
                 Intent intent1 = new Intent(this, AdminActivity.class);
                 if (username.equals("admin")) {
                     startActivity(intent1);

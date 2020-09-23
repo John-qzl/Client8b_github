@@ -55,6 +55,7 @@ import com.example.navigationdrawertest.activity.SignActivity;
 import com.example.navigationdrawertest.activity.SignActivity1;
 import com.example.navigationdrawertest.adapter.Event.LocationEvent;
 import com.example.navigationdrawertest.application.OrientApplication;
+import com.example.navigationdrawertest.model.BCRelation;
 import com.example.navigationdrawertest.model.Cell;
 import com.example.navigationdrawertest.model.Operation;
 import com.example.navigationdrawertest.model.Post;
@@ -97,9 +98,11 @@ public class FragmentCheck extends Fragment {
 	private ProgressDialog prodlg;
 	private AlertDialog.Builder dialog;
 	private AlertDialog alertDialog3; //多选框
+	private String fieldType = "";  //1产品验收  2武器所检  3靶场试验
 
-	public FragmentCheck(RwRelation proEntity){
+	public FragmentCheck(RwRelation proEntity, String fieldType){
 		this.proEntity = proEntity;
+		this.fieldType = fieldType;
 	}
 
 	@Override
@@ -162,79 +165,97 @@ public class FragmentCheck extends Fragment {
 				}
 			}
 			rootNode = new DepartmentNode(Long.valueOf(proEntity.getRwid()), proEntity.getRwname(), "0", null, 0);
-			//3,获取所有的岗位实例-path
-			//产品类型节点
-			for(int i=0; i<rwList.size(); i++){
+			//产品验收领域树结构
+			if (fieldType.equals("1")) {
+				//3,获取所有的岗位实例-path
+				//产品类型节点
+				for (int i = 0; i < rwList.size(); i++) {
 //				rootNode = new DepartmentNode(Long.valueOf(rwList.get(i).getRwid()), rwList.get(i).getRwname(), "0", null, 0);
-				TreeNode node0 = new DepartmentNode(Long.valueOf(rwList.get(i).getRwid()), rwList.get(i).getRwname(), "0", rootNode, 1);
+					TreeNode node0 = new DepartmentNode(Long.valueOf(rwList.get(i).getRwid()), rwList.get(i).getRwname(), "0", rootNode, 1);
 //				rootNode.add(node0);
 
-				List<Rw> rwList_pc = new ArrayList<Rw>();				//批次
-				List<Task> taskList_cplx = DataSupport.where("location = ? and rwid =?", "1",rwList.get(i).getRwid()).find(Task.class);
-				rwList_pc.clear();
-				for (int l = 0; l < taskList_cplx.size(); l++) {
-					String pc = taskList_cplx.get(l).getPath();
-					String pcId = taskList_cplx.get(l).getPathId();
-					Rw rw = new Rw();
-					rw.setRwid(pcId);
-					rw.setRwname(pc);
-					if (rwList_pc.size() > 0) {
-						String str = "";
-						for (int j = 0; j < rwList_pc.size(); j++) {
-							str = str + rwList_pc.get(j).getRwid();
-						}
-						if (!str.contains(pcId)) {
-							rwList_pc.add(rw);
-						}
-					} else {
-						rwList_pc.add(rw);
-					}
-				}
-				//批次节点
-				for (int j = 0; j < rwList_pc.size(); j++) {
-					TreeNode node1 = new DepartmentNode(Long.valueOf(rwList_pc.get(j).getRwid()), rwList_pc.get(j).getRwname(),  "0", rootNode, 2);
-//					rootNode.add(node1);
-
-					List<Rw> rwList_ch = new ArrayList<Rw>();				//策划
-					List<Task> taskList_cppc = DataSupport.where("location = ? and pathId =?", "1",rwList_pc.get(j).getRwid()).find(Task.class);
-					rwList_ch.clear();
-					for (int l = 0; l < taskList_cppc.size(); l++) {
-						String ch = taskList_cppc.get(l).getChbh();
-						String chId = taskList_cppc.get(l).getChId();
+					List<Rw> rwList_pc = new ArrayList<Rw>();                //批次
+					List<Task> taskList_cplx = DataSupport.where("location = ? and rwid =?", "1", rwList.get(i).getRwid()).find(Task.class);
+					rwList_pc.clear();
+					for (int l = 0; l < taskList_cplx.size(); l++) {
+						String pc = taskList_cplx.get(l).getPath();
+						String pcId = taskList_cplx.get(l).getPathId();
 						Rw rw = new Rw();
-						rw.setRwid(chId);
-						rw.setRwname(ch);
-						if (rwList_ch.size() > 0) {
+						rw.setRwid(pcId);
+						rw.setRwname(pc);
+						if (rwList_pc.size() > 0) {
 							String str = "";
-							for (int i1 = 0; i1 < rwList_ch.size(); i1++) {
-								str = str + rwList_ch.get(i1).getRwid();
+							for (int j = 0; j < rwList_pc.size(); j++) {
+								str = str + rwList_pc.get(j).getRwid();
 							}
-							if (!str.contains(chId)) {
-								rwList_ch.add(rw);
+							if (!str.contains(pcId)) {
+								rwList_pc.add(rw);
 							}
 						} else {
-							rwList_ch.add(rw);
+							rwList_pc.add(rw);
 						}
 					}
-					//4,获取所有表格ID---表格名称
-					for(int k=0; k<rwList_ch.size(); k++){
-						TreeNode node = new DepartmentNode(Long.valueOf(rwList_ch.get(k).getRwid()), rwList_ch.get(k).getRwname(),  "0", node1, 3);
-//						rootNode.add(node);
+					//批次节点
+					for (int j = 0; j < rwList_pc.size(); j++) {
+						TreeNode node1 = new DepartmentNode(Long.valueOf(rwList_pc.get(j).getRwid()), rwList_pc.get(j).getRwname(), "0", rootNode, 2);
+//					rootNode.add(node1);
 
-						List<Task> tasknodeList = new ArrayList<Task>();
-						for(Task task : taskList_cppc){
-							if(task.getChId().equals(rwList_ch.get(k).getRwid())){
-								tasknodeList.add(task);
+						List<Rw> rwList_ch = new ArrayList<Rw>();                //策划
+						List<Task> taskList_cppc = DataSupport.where("location = ? and pathId =?", "1", rwList_pc.get(j).getRwid()).find(Task.class);
+						rwList_ch.clear();
+						for (int l = 0; l < taskList_cppc.size(); l++) {
+							String ch = taskList_cppc.get(l).getChbh();
+							String chId = taskList_cppc.get(l).getChId();
+							Rw rw = new Rw();
+							rw.setRwid(chId);
+							rw.setRwname(ch);
+							if (rwList_ch.size() > 0) {
+								String str = "";
+								for (int i1 = 0; i1 < rwList_ch.size(); i1++) {
+									str = str + rwList_ch.get(i1).getRwid();
+								}
+								if (!str.contains(chId)) {
+									rwList_ch.add(rw);
+								}
+							} else {
+								rwList_ch.add(rw);
 							}
 						}
-						for(int loop=0; loop<tasknodeList.size(); loop++){
-							node.add(new UserNode(Long.valueOf(tasknodeList.get(loop).getTaskid()), tasknodeList.get(loop).getTaskname(), node, 4));
+						//4,获取所有表格ID---表格名称
+						for (int k = 0; k < rwList_ch.size(); k++) {
+							TreeNode node = new DepartmentNode(Long.valueOf(rwList_ch.get(k).getRwid()), rwList_ch.get(k).getRwname(), "0", node1, 3);
+//						rootNode.add(node);
+
+							List<Task> tasknodeList = new ArrayList<Task>();
+							for (Task task : taskList_cppc) {
+								if (task.getChId().equals(rwList_ch.get(k).getRwid())) {
+									tasknodeList.add(task);
+								}
+							}
+							for (int loop = 0; loop < tasknodeList.size(); loop++) {
+								node.add(new UserNode(Long.valueOf(tasknodeList.get(loop).getTaskid()), tasknodeList.get(loop).getTaskname(), node, 4));
+							}
+							node1.add(node);
 						}
-						node1.add(node);
+						node0.add(node1);
 					}
-					node0.add(node1);
+					rootNode.add(node0);
 				}
-				rootNode.add(node0);
+			}
+			//其他领域树结构
+			else {
+				List<BCRelation> bcRelationList = DataSupport.where("ssxh = ?", proEntity.getRwid()).find(BCRelation.class);
+				if (bcRelationList.size() > 0) {
+					for (int k = 0; k < bcRelationList.size(); k++) {
+						TreeNode node = new DepartmentNode(Long.valueOf(bcRelationList.get(k).getChid()), bcRelationList.get(k).getChname(), "0", rootNode, 1);
+
+						List<Task> BCtaskList = DataSupport.where("location = ? and chId =?", "1", bcRelationList.get(k).getChid()).find(Task.class);;
+						for (int loop = 0; loop < BCtaskList.size(); loop++) {
+							node.add(new UserNode(Long.valueOf(BCtaskList.get(loop).getTaskid()), BCtaskList.get(loop).getTaskname(), node, 2));
+						}
+						rootNode.add(node);
+					}
+				}
 			}
 			rootNode.expandAllNode();
 			rootNode.filterVisibleNode(nodeList);

@@ -59,6 +59,7 @@ import com.example.navigationdrawertest.activity.LoginActivity;
 import com.example.navigationdrawertest.application.OrientApplication;
 import com.example.navigationdrawertest.data.AerospaceDB;
 import com.example.navigationdrawertest.fragment.FragmentCheck;
+import com.example.navigationdrawertest.model.BCRelation;
 import com.example.navigationdrawertest.model.Cell;
 import com.example.navigationdrawertest.model.Mmc;
 import com.example.navigationdrawertest.model.Operation;
@@ -106,6 +107,8 @@ public class SyncWorkThread extends Thread {
 
 		// 2-1,下载任务~人员关系表
 		downloadRwUser();
+        //下载靶场策划信息
+		downloadBCRwUser();
 
 		// 2,下载未完成表格清单
 		// 3,下载未完成XML:downloadUnfinish
@@ -648,7 +651,7 @@ public class SyncWorkThread extends Thread {
 	}
 
 	/**
-	 * 下载产品表分函数
+	 * 下载型号
 	 * 
 	 * @return
 	 */
@@ -656,11 +659,6 @@ public class SyncWorkThread extends Thread {
 		if(!xmlContent.equals("")){
 			String[] pro = xmlContent.split("\\?");
 			for (int i = 0; i < pro.length; i++) {
-//				int startLocation = pro[i].lastIndexOf(",") + 2;
-//				int endLocation = pro[i].lastIndexOf("#");
-//				String str = pro[i].substring(startLocation,
-//						endLocation);
-//				String str1 = str.substring(0, str.length());
 				String proId = pro[i].split("\\,")[0];
 				String proName = pro[i].split("\\,")[1];
 				String productId = pro[i].split("\\,")[2];
@@ -677,13 +675,43 @@ public class SyncWorkThread extends Thread {
 				proRe.setProductid(productId);
 				proRe.setUserid(user.getUserid());
 				proRe.setUsername(user.getUsername());
-//				if (!str1.equals("")) {
-//					proRe.setNodeId(str1);
-//				} else {
-//					proRe.setNodeId("");
-//				}
 				syncList.add(proRe.getRwid() + "---RwRelation表保存成功");
 				proRe.save();
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * @Description: 靶场策划信息
+	 * @author qiaozhili
+	 * @date 2020/9/21 17:33
+	 * @param
+	 * @return
+	 */
+	private boolean updatePostBCDB(String xmlContent, User user) {
+		if(!xmlContent.equals("")){
+			String[] pro = xmlContent.split("\\?");
+			for (int i = 0; i < pro.length; i++) {
+				String CHId = pro[i].split("\\,")[0];
+				String CHName = pro[i].split("\\,")[1];
+				String productId = pro[i].split("\\,")[2];//所属型号ID
+				String productName = pro[i].split("\\,")[3];//所属型号ID
+				BCRelation bcRW = new BCRelation();
+				List<BCRelation> bcRelationList = DataSupport.findAll(BCRelation.class);
+				StringBuffer relationStr = new StringBuffer();
+				for (BCRelation bcRelation : bcRelationList) {
+					relationStr.append(bcRelation.getChid()).append(",");
+				}
+				if (!relationStr.toString().contains(CHId)) {
+					bcRW.setChid(CHId);
+					bcRW.setChname(CHName);
+					bcRW.setSsxh(productId);
+					bcRW.setXhdh(productName);
+					bcRW.setSyfzrID(user.getUserid());
+					syncList.add(bcRW.getChid() + "---BCRelation表保存成功");
+					bcRW.save();
+				}
 			}
 		}
 		return true;
@@ -735,6 +763,57 @@ public class SyncWorkThread extends Thread {
 		}
 		return true;
 	}
+
+	/**
+	 * @Description: 下载靶场策划信息
+	 * @author qiaozhili
+	 * @date 2020/9/21 16:32
+	 * @param
+	 * @return
+	 */
+    public boolean downloadBCRwUser() {
+        DataSupport.deleteAll(BCRelation.class);
+        HttpClient client = HttpClientHelper.getOrientHttpClient();
+        HttpPost postmethod = new HttpPost(HttpClientHelper.getURL());
+        errorMessage = "网络有误!";
+        List<User> userList = DataSupport.findAll(User.class);
+        for (User user : userList) {
+            try {
+                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(
+                        1);
+                nameValuePairs.add(new BasicNameValuePair("operationType",
+                        "getBCuserrwrelation"));
+                // nameValuePairs.add(new BasicNameValuePair("username",
+                // OrientApplication.getApplication().loginUser.getUsername()));
+                nameValuePairs.add(new BasicNameValuePair("username", user
+                        .getUsername()));
+                postmethod.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+                HttpResponse response = client.execute(postmethod);
+                int code = response.getStatusLine().getStatusCode();
+                if (code != 200) {
+                    errorMessage = code + "错误";
+                    return false; // 错误
+                }
+                String xmlContent = EntityUtils.toString(response.getEntity(),
+                        "utf-8");
+
+                boolean isUpdateRight = this.updatePostBCDB(xmlContent, user);
+                if (isUpdateRight == false) {
+                    return false;
+                }
+            } catch (ClientProtocolException e) {
+                e.printStackTrace();
+                return false;
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+        return true;
+    }
 
 	/**
 	 * Operation保存
@@ -1167,7 +1246,7 @@ public class SyncWorkThread extends Thread {
 		}
 	}
 
-	private boolean downloadUnfinish(String tableIDs, String tempId) { // tableIDs是待下载表格实例的ID，仅有一个
+	private boolean downloadUnfinish(String tableIDs, String tempId, String fieldTye) { // tableIDs是待下载表格实例的ID，仅有一个
 		// 1,gettask
 		// 2,gethtml
 		// 3,getpic
@@ -1185,6 +1264,7 @@ public class SyncWorkThread extends Thread {
 //			nameValuePairs.add(new BasicNameValuePair("taskversion", Integer
 //					.parseInt(version) + 1 + ""));
 			nameValuePairs.add(new BasicNameValuePair("tempId", tempId));
+			nameValuePairs.add(new BasicNameValuePair("fieldTye", fieldTye));
 			getTaskPostmethod
 					.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 			response = getTaskClient.execute(getTaskPostmethod);
@@ -1502,6 +1582,7 @@ public class SyncWorkThread extends Thread {
 					tempTable.setPathId(ServerTableString[i].split(",")[3]);
 					tempTable.setTaskname(ServerTableString[i].split(",")[4]);
 					tempTable.setVersion(ServerTableString[i].split(",")[5]);
+					tempTable.setFieldType(ServerTableString[i].split(",")[6]);
 					UnfinishList.add(tempTable);
 				}
 			}
@@ -1616,7 +1697,7 @@ public class SyncWorkThread extends Thread {
 				// downloadUnfinish(addint);
 				// }
 				for (Task task : addTaskList) {
-					downloadUnfinish(task.getTaskid(), task.getTempid());
+					downloadUnfinish(task.getTaskid(), task.getTempid(), task.getFieldType());
 				}
 			}
 		} catch (ClientProtocolException e) {
@@ -1734,8 +1815,7 @@ public class SyncWorkThread extends Thread {
 
 	// 4,上传待上传XML
 	private boolean uploadTable() {
-		String userid = OrientApplication.getApplication().loginUser
-				.getUserid();
+		String userid = OrientApplication.getApplication().loginUser.getUserid();
 		// String rwid = OrientApplication.getApplication().rw.getRwid();
 		String location = "3";
 		try {
@@ -1775,6 +1855,7 @@ public class SyncWorkThread extends Thread {
 				nameValuePairs.add(new BasicNameValuePair("htmlContent", html));
 				nameValuePairs.add(new BasicNameValuePair("tempId", task.getTempid()));
 				nameValuePairs.add(new BasicNameValuePair("planId", task.getChId()));
+				nameValuePairs.add(new BasicNameValuePair("userid", userid));
 				postmethod.setEntity(new UrlEncodedFormEntity(nameValuePairs, "utf-8"));
 				Log.i("setEntity", task.getTaskname() + "OK");
 				postmethod.setHeader("Content-Type",

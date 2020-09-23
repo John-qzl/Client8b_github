@@ -17,6 +17,7 @@ public class RwRelation extends DataSupport{
 	private String productid; 		//产品类别ID，
 	private String nodeId;          //节点ID，也就是子节点ID
 	private String yschCode;          //验收策划Code
+	private String fieldType;          //领域
 
 	public String getYschCode() {
 		return yschCode;
@@ -70,5 +71,12 @@ public class RwRelation extends DataSupport{
 	public void setProductid(String productid) {
 		this.productid = productid;
 	}
-	
+
+	public String getFieldType() {
+		return fieldType;
+	}
+
+	public void setFieldType(String fieldType) {
+		this.fieldType = fieldType;
+	}
 }

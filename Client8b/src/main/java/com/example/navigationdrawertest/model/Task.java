@@ -23,6 +23,7 @@ public class Task extends DataSupport{
 	private int location;				//1,2,3,4（位置）
 	private String taskpic;				//表格照片（暂时不提示），就是在表格实例中的照片，随着表格实例而来的
 	private String tablesize;			//是否拆分表格
+	private String fieldType;			//领域
 
 
 	private String rwid;					//发次ID
@@ -62,6 +63,14 @@ public class Task extends DataSupport{
 	private String xhId;			//型号ID
 	private String tempType;			//模板类型tempType
 	private String deviceCode;			//当前设备编号
+
+	public String getFieldType() {
+		return fieldType;
+	}
+
+	public void setFieldType(String fieldType) {
+		this.fieldType = fieldType;
+	}
 
 	public String getTempType() {
 		return tempType;

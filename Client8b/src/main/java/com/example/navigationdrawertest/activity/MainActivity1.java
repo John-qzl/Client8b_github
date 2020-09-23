@@ -99,7 +99,7 @@ public class MainActivity1 extends FragmentActivity implements OnItemClickListen
 
     private DrawerLayout mDrawerLayout;
     private ImageView leftMenu, mDoneSync;
-    private LinearLayout mSyn, mMedia, mQuit, mSign;
+    private LinearLayout mSyn, mMedia, mQuit, mSign, mHome;
     private TextView mtitle, mLoginName;
     private ListView mDrawerList;
     private NavDrawerListAdapter mAdapter;
@@ -110,6 +110,7 @@ public class MainActivity1 extends FragmentActivity implements OnItemClickListen
     private AlertDialog.Builder dialog;
     private TreeNode rootNode;
     private String nowProductId;
+    private String fieldType = "";  //1产品验收  2武器所检  3靶场试验
 
     public static void actionStart1(Context context) {
         Intent intent = new Intent(context, MainActivity1.class);
@@ -124,6 +125,7 @@ public class MainActivity1 extends FragmentActivity implements OnItemClickListen
         ActivityCollector.addActivity(this);
         initUserInformation();
         initview();
+        fieldType = getIntent().getStringExtra("fieldType");
         localPosition = 0;
         selectItem(localPosition);
         mtitle.setText(R.string.app_name);
@@ -139,6 +141,7 @@ public class MainActivity1 extends FragmentActivity implements OnItemClickListen
         mtitle = (TextView) findViewById(R.id.title);
         mSyn = (LinearLayout) findViewById(R.id.data_syn);
         mSign = (LinearLayout) findViewById(R.id.signPhoto_collect);
+        mHome = (LinearLayout) findViewById(R.id.home);
 //        mDoneSync = (ImageView) findViewById(R.id.done_data_syn);
         mMedia = (LinearLayout) findViewById(R.id.media);
         mQuit = (LinearLayout) findViewById(R.id.quit);
@@ -343,6 +346,13 @@ public class MainActivity1 extends FragmentActivity implements OnItemClickListen
                 startActivity(intent);
             }
         });
+        mHome.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity1.this, GateActivity.class);
+                startActivity(intent);
+            }
+        });
         mNavMenuIconsTypeArray = getResources()
                 .obtainTypedArray(R.array.nav_drawer_icons);
 
@@ -391,7 +401,7 @@ public class MainActivity1 extends FragmentActivity implements OnItemClickListen
 //            if (nodeIds != null) {
 //                isCommander(nodeIds);
 //            }
-            fragment = new HomeFragment(proEntity);
+            fragment = new HomeFragment(proEntity, fieldType);
         }
 
         if (fragment != null) {

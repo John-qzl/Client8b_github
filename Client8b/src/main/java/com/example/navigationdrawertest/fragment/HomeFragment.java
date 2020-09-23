@@ -43,6 +43,7 @@ public class HomeFragment extends Fragment {
 	private MyPagerAdapter myAdapter;				//适配器定义
 	
 	private Handler handler;
+	private String fieldType = "";  //1产品验收  2武器所检  3靶场试验
 
 	/**
 	 * PagerSlidingTabStrip的实例
@@ -53,9 +54,10 @@ public class HomeFragment extends Fragment {
 	 * 获取当前屏幕的密度
 	 */
 	private DisplayMetrics dm;
-	
-	public HomeFragment(RwRelation proEntity){
+
+	public HomeFragment(RwRelation proEntity, String fieldType) {
 		this.proEntity = proEntity;
+		this.fieldType = fieldType;
 //		refresh();
 	}
 
@@ -138,27 +140,27 @@ public class HomeFragment extends Fragment {
 			switch (position) {
 			case 0:
 				if (fragmentcheck == null) {
-					fragmentcheck = new FragmentCheck(proEntity);
+					fragmentcheck = new FragmentCheck(proEntity, fieldType);
 				}
 				return fragmentcheck;
 			case 1:
 				if (fragmentsign == null) {
-					fragmentsign = new FragmentSign(proEntity);
+					fragmentsign = new FragmentSign(proEntity, fieldType);
 				}
 				return fragmentsign;
 			case 2:
 				if (fragmentunupload == null) {
-					fragmentunupload = new FragmentUnupload(proEntity);
+					fragmentunupload = new FragmentUnupload(proEntity, fieldType);
 				}
 				return fragmentunupload;
 			case 3:
 				if (fragmentupload == null) {
-					fragmentupload = new FragmentUpload(proEntity);
+					fragmentupload = new FragmentUpload(proEntity, fieldType);
 				}
 				return fragmentupload;
 			case 4:
 				if (fragmentall == null) {
-					fragmentall = new FragmentAll(proEntity);
+					fragmentall = new FragmentAll(proEntity, fieldType);
 				}
 				return fragmentall;
 			default:

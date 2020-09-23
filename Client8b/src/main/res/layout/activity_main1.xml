@@ -43,46 +43,6 @@
                 android:textSize="@dimen/titleI"
                 android:layout_marginLeft="8dp"/>
 
-            <!--<ImageView-->
-                <!--android:id="@+id/done_data_syn"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_centerVertical="true"-->
-                <!--android:src="@drawable/upload_normal"-->
-                <!--android:layout_toLeftOf="@+id/data_syn"-->
-                <!--android:layout_marginRight="10dp"-->
-                <!--android:visibility="gone"/>-->
-
-            <!--<ImageView-->
-                <!--android:id="@+id/data_syn"-->
-                <!--android:layout_width="100dp"-->
-                <!--android:layout_height="25dp"-->
-                <!--android:layout_centerVertical="true"-->
-                <!--android:src="@drawable/data_syn"-->
-                <!--android:layout_toLeftOf="@+id/media"-->
-                <!--android:layout_marginRight="10dp"-->
-                <!--android:visibility="gone"/>-->
-
-            <!--<ImageView-->
-                <!--android:id="@+id/media"-->
-                <!--android:layout_width="110dp"-->
-                <!--android:layout_height="25dp"-->
-                <!--android:layout_centerVertical="true"-->
-                <!--android:src="@drawable/media_new"-->
-                <!--android:layout_toLeftOf="@+id/quit"-->
-                <!--android:layout_marginRight="10dp"-->
-                <!--android:visibility="gone"/>-->
-
-            <!--<ImageView-->
-                <!--android:id="@+id/quit"-->
-                <!--android:layout_width="70dp"-->
-                <!--android:layout_height="25dp"-->
-                <!--android:layout_centerVertical="true"-->
-                <!--android:layout_alignParentRight="true"-->
-                <!--android:src="@drawable/back_new"-->
-                <!--android:layout_marginRight="15dp"-->
-                <!--android:visibility="gone"/>-->
-
             <LinearLayout
                 android:id="@+id/signPhoto_collect"
                 android:layout_width="wrap_content"
@@ -103,6 +63,30 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="电子签章"
+                    android:textSize="@dimen/size14"
+                    android:textColor="@color/White" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/home"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:layout_toLeftOf="@+id/data_syn"
+                android:orientation="horizontal"
+                android:layout_marginRight="15dp">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/home"
+                    android:layout_marginRight="5dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="主页"
                     android:textSize="@dimen/size14"
                     android:textColor="@color/White" />
 

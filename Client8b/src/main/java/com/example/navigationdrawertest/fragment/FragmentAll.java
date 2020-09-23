@@ -62,13 +62,15 @@ public class FragmentAll extends Fragment{
 	private NodeButtonEnum buttontype;
 	private RwRelation proEntity;				//传递过来的项目树节点
 	private static User user;
+	private String fieldType = "";  //1产品验收  2武器所检  3靶场试验
 
 	public FragmentAll() {
 		context = getActivity();
 	}
 	
-	public FragmentAll(RwRelation proEntity){
+	public FragmentAll(RwRelation proEntity, String fieldType){
 		this.proEntity = proEntity;
+		this.fieldType = fieldType;
 	}
 	
 	@Override

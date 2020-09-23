@@ -68,7 +68,9 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 	private ActionBarDrawerToggle mDrawerToggle;
 	private List<RwRelation> projectList;
 	private static int localPosition = 0;
-	
+	private String fieldType = "";  //1产品验收  2武器所检  3靶场试验
+
+
 	public static void actionStart(Context context) {
 		Intent intent = new Intent(context, MainActivity.class);
 		context.startActivity(intent);
@@ -241,7 +243,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 				Log.i("项目名称", proEntity.getRwname());
 			}
 			localPosition = position;
-			fragment = new HomeFragment(proEntity);
+			fragment = new HomeFragment(proEntity, fieldType);
 		}
 
 		if (fragment != null) {
