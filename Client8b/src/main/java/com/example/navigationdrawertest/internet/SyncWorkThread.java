@@ -666,17 +666,17 @@ public class SyncWorkThread extends Thread {
 				List<RwRelation> rwRelationList = DataSupport.findAll(RwRelation.class);
 				StringBuffer relationStr = new StringBuffer();
 				for (RwRelation rwRelation : rwRelationList) {
-					relationStr.append(rwRelation.getRwid()).append(",");
+					relationStr.append(rwRelation.getProductid()).append(",").append(rwRelation.getUserid()).append(";");
 				}
-				if (!relationStr.toString().contains(proId)) {
+				if (!relationStr.toString().contains(proId + "," + user.getUserid())) {
+					proRe.setRwid(proId);
+					proRe.setRwname(proName);
+					proRe.setProductid(productId);
+					proRe.setUserid(user.getUserid());
+					proRe.setUsername(user.getUsername());
+					syncList.add(proRe.getRwid() + "---RwRelation表保存成功");
+					proRe.save();
 				}
-				proRe.setRwid(proId);
-				proRe.setRwname(proName);
-				proRe.setProductid(productId);
-				proRe.setUserid(user.getUserid());
-				proRe.setUsername(user.getUsername());
-				syncList.add(proRe.getRwid() + "---RwRelation表保存成功");
-				proRe.save();
 			}
 		}
 		return true;
@@ -1721,8 +1721,8 @@ public class SyncWorkThread extends Thread {
 		HttpPost postmethod = new HttpPost(HttpClientHelper.getURL());
 		try {
 			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
-			nameValuePairs.add(new BasicNameValuePair("operationType",
-					"getUsers"));
+			nameValuePairs.add(new BasicNameValuePair("operationType", "getUsers"));
+			nameValuePairs.add(new BasicNameValuePair("userName", OrientApplication.getApplication().loginUser.getUsername()));
 			postmethod.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 			HttpResponse response = client.execute(postmethod);
 			int code = response.getStatusLine().getStatusCode();
@@ -1737,9 +1737,7 @@ public class SyncWorkThread extends Thread {
 				return false;
 			}
 			OrientApplication.getApplication().loginUser = DataSupport
-					.where("username = ?",
-							OrientApplication.getApplication().loginUser
-									.getUsername()).find(User.class).get(0);
+					.where("username = ?", OrientApplication.getApplication().loginUser.getUsername()).find(User.class).get(0);
 			// List<User> userlist = DataSupport.where("username = ?",
 			// OrientApplication.getApplication().loginUser.getUsername()).find(User.class);
 		} catch (ClientProtocolException e) {

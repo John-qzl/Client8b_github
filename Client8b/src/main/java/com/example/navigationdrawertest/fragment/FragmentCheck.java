@@ -206,19 +206,29 @@ public class FragmentCheck extends Fragment {
 						for (int l = 0; l < taskList_cppc.size(); l++) {
 							String ch = taskList_cppc.get(l).getChbh();
 							String chId = taskList_cppc.get(l).getChId();
-							Rw rw = new Rw();
-							rw.setRwid(chId);
-							rw.setRwname(ch);
-							if (rwList_ch.size() > 0) {
-								String str = "";
-								for (int i1 = 0; i1 < rwList_ch.size(); i1++) {
-									str = str + rwList_ch.get(i1).getRwid();
+							//判读当前人是否有查看此策划的权限
+							List<RwRelation> proList = DataSupport.where("userid = ?", OrientApplication.getApplication().loginUser.getUserid()).find(RwRelation.class);
+							List<String> CHIDs = new ArrayList<>();
+							for (RwRelation rw : proList) {
+								if (!CHIDs.contains(rw.getProductid())) {
+									CHIDs.add(rw.getProductid());
 								}
-								if (!str.contains(chId)) {
+							}
+							if (CHIDs.contains(chId)) {
+								Rw rw = new Rw();
+								rw.setRwid(chId);
+								rw.setRwname(ch);
+								if (rwList_ch.size() > 0) {
+									String str = "";
+									for (int i1 = 0; i1 < rwList_ch.size(); i1++) {
+										str = str + rwList_ch.get(i1).getRwid();
+									}
+									if (!str.contains(chId)) {
+										rwList_ch.add(rw);
+									}
+								} else {
 									rwList_ch.add(rw);
 								}
-							} else {
-								rwList_ch.add(rw);
 							}
 						}
 						//4,获取所有表格ID---表格名称
@@ -331,6 +341,7 @@ public class FragmentCheck extends Fragment {
 					public void onClick(DialogInterface dialog, int which) {
 						dialog.dismiss();
 						Intent intent1 = new Intent(getActivity(), MainActivity1.class);
+						intent1.putExtra("fieldType", "1");
 						startActivity(intent1);
 
 					}

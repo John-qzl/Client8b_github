@@ -311,6 +311,7 @@ public class CheckActivity1 extends BaseActivity implements ObservableScrollView
                 OrientApplication.getApplication().setPanduFlag(1);
                 List<Cell> actualvalCellList = DataSupport.where("markup=? and taskid=?", Config.actualval, task_id + "").order("verticalorder asc").find(Cell.class);
                 List<String> actualvalVerti = new ArrayList<String>();
+                StringBuffer prefixCodes = new StringBuffer();   //不符合标准的要求值
                 if (actualvalCellList.size() != 0) {
                     for (Cell cell : actualvalCellList) {
                         String verti = cell.getVerticalorder();
@@ -319,7 +320,7 @@ public class CheckActivity1 extends BaseActivity implements ObservableScrollView
                         }
                         if (cell.getMarkup().equals(Config.actualval) && OrientApplication.getApplication().getPageflage() == 1
                                 && !cell.getHorizontalorder().equals("1")) {
-                            pandu(cell);
+                            pandu(cell, prefixCodes);
                         }
                     }
                     if (actualvalVerti.size() > 0) {
@@ -327,9 +328,12 @@ public class CheckActivity1 extends BaseActivity implements ObservableScrollView
 //							int isBuFuhe = 0;
                             List<String> fuHeDuList = new ArrayList<String>();
                             List<Cell> actVertiCellList = DataSupport.where("markup=? and taskid=? and verticalorder=?", Config.actualval, task_id + "", actualvalVerti.get(i)).order("horizontalorder desc").find(Cell.class);
-                            for (int j = 1; j < actVertiCellList.size(); j++) {
-                                String fuhedu = actVertiCellList.get(j).getIsFuhe();
-                                fuHeDuList.add(fuhedu);
+                            List<Cell> cellList = DataSupport.where("markup=? and taskid=? and verticalorder=? and horizontalorder=?", Config.actualval, task_id + "", actualvalVerti.get(i), String.valueOf(actVertiCellList.size())).find(Cell.class);
+                            for (int j = 0; j < actVertiCellList.size(); j++) {
+                                if (!actVertiCellList.get(j).getHorizontalorder().equals(String.valueOf(actVertiCellList.size()))) {
+                                    String fuhedu = actVertiCellList.get(j).getIsFuhe();
+                                    fuHeDuList.add(fuhedu);
+                                }
 //								if (!fuhedu.equals("")) {
 //									if (fuhedu.equals(Config.buhege)) {
 //										isBuFuhe = 1; //此列结论不符合
@@ -338,18 +342,22 @@ public class CheckActivity1 extends BaseActivity implements ObservableScrollView
 //									}
 //								}
                             }
-                            Operation operation = DataSupport.where("cellid=? and taskid=?", actVertiCellList.get(0).getCellid(), task_id + "").find(Operation.class).get(0);
+                            Operation operation = DataSupport.where("cellid=? and taskid=?", cellList.get(0).getCellid(), task_id + "").find(Operation.class).get(0);
                             if (fuHeDuList.contains(Config.buhege)) {
-                                judgeResult1(false, actVertiCellList.get(0), operation);
+                                judgeResult1(false, cellList.get(0), operation);
                             } else if (!fuHeDuList.contains(Config.buhege) && fuHeDuList.contains(Config.hege)) {
-                                judgeResult1(true, actVertiCellList.get(0), operation);
+                                judgeResult1(true, cellList.get(0), operation);
                             }
                         }
                     }
-                    CheckActivity1.actionStart(CheckActivity1.this, task_id, mHandler, "3");
-                    finish();
                 } else {
                     Toast.makeText(context, "没有查询到判读依据！", Toast.LENGTH_SHORT).show();
+                }
+                if (!prefixCodes.toString().equals("")) {
+                    showDialog(prefixCodes.toString());
+                } else {
+                    CheckActivity1.actionStart(CheckActivity1.this, task_id, mHandler, "3");
+                    finish();
                 }
             }
         });
@@ -2279,7 +2287,7 @@ public class CheckActivity1 extends BaseActivity implements ObservableScrollView
         super.finish();
     }
 
-    private void pandu(Cell cell) {
+    private void pandu(Cell cell, StringBuffer prefixCodes) {
         //实测值
         List<Cell> actualvalCellList = DataSupport.where("horizontalorder=? and taskid=? and markup=? and rowsid=?", cell.getHorizontalorder(), task_id + "", Config.actualval, String.valueOf(pagetype)).find(Cell.class);
         //要求值
@@ -2368,6 +2376,9 @@ public class CheckActivity1 extends BaseActivity implements ObservableScrollView
         }
         //文字类型判读，判断是否包含“已”“未”
         else if (m1.find()) {
+            if (actualvalNum.equals("/")) {
+                return;
+            }
             if (!actualvalNum.equals("")) {
                 if (actualvalNum.contains(Config.bmz) || actualvalNum.contains(Config.bfh) || actualvalNum.contains(Config.bn)
                         || actualvalNum.contains(Config.bzc) || actualvalNum.contains(Config.bwz) || actualvalNum.contains(Config.yqx)
@@ -2490,7 +2501,8 @@ public class CheckActivity1 extends BaseActivity implements ObservableScrollView
                 judgeResult(false, cell, operation2);
             }
         } else {
-//			Toast.makeText(context, "“"+prefixCode+ "”" + "格式有误，不可判读！", Toast.LENGTH_SHORT).show();
+            prefixCodes.append(prefixCode).append("；");
+//            Toast.makeText(context, "“"+prefixCode+ "”" + "格式有误，不可判读！", Toast.LENGTH_SHORT).show();
         }
 //        //上下偏差情况
 //        else {
@@ -2694,5 +2706,20 @@ public class CheckActivity1 extends BaseActivity implements ObservableScrollView
             }
         });
         dialog.show();
+    }
+
+    public void showDialog(String str) {
+        AlertDialog.Builder builder=new AlertDialog.Builder(this);
+        builder.setIcon(R.drawable.logo_title).setTitle("提示:以下要求值格式不符合标准，无法判读");
+        builder.setMessage(str)
+                .setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        CheckActivity1.actionStart(CheckActivity1.this, task_id, mHandler, "3");
+                        finish();
+                        dialog.dismiss();
+                    }
+                });
+        builder.create().show();
     }
 }

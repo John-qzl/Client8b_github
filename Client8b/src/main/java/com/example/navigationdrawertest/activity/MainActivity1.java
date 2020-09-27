@@ -401,6 +401,9 @@ public class MainActivity1 extends FragmentActivity implements OnItemClickListen
 //            if (nodeIds != null) {
 //                isCommander(nodeIds);
 //            }
+            if (fieldType == null) {
+                fieldType = "1";
+            }
             fragment = new HomeFragment(proEntity, fieldType);
         }
 
