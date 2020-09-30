@@ -6,10 +6,13 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -28,6 +31,7 @@ import android.widget.Toast;
 import com.example.navigationdrawertest.R;
 import com.example.navigationdrawertest.application.OrientApplication;
 import com.example.navigationdrawertest.internet.SyncWorkThread;
+import com.example.navigationdrawertest.internet.UpdataVersionThread;
 import com.example.navigationdrawertest.model.Cell;
 import com.example.navigationdrawertest.model.Diagram;
 import com.example.navigationdrawertest.model.Mmc;
@@ -52,16 +56,18 @@ import org.litepal.crud.DataSupport;
 import java.io.File;
 import java.util.ArrayList;
 
+import static com.example.navigationdrawertest.customCamera.album.view.FilterImageView.TAG;
+
 /**
  * Created by user on 2020/8/18.
  */
 
 public class AdminActivity extends BaseActivity {
-    private Button mDelAll, mSignCollect;
     private AlertDialog.Builder dialog;
     private ProgressDialog prodlg;
-    private LinearLayout mQuit,mSyn;
+    private LinearLayout mQuit, mSyn, mDelAll, mSignCollect, mUpdate;
     private TextView mLoginName;
+    private Context context;
 
     public static void actionStart1(Context context) {
         Intent intent = new Intent(context, AdminActivity.class);
@@ -93,10 +99,11 @@ public class AdminActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.admin_layout);
+        context = this;
         mQuit = (LinearLayout) findViewById(R.id.quit);
         mLoginName = (TextView) findViewById(R.id.loginName);
         mLoginName.setText(OrientApplication.getApplication().loginUser.getUsername() + "");
-        mDelAll = (Button) findViewById(R.id.admin_delAll);
+        mDelAll = (LinearLayout) findViewById(R.id.line_admin_delAll);
         mDelAll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -120,7 +127,7 @@ public class AdminActivity extends BaseActivity {
                 dialog.show();
             }
         });
-        mSignCollect = (Button) findViewById(R.id.admin_signcollect);
+        mSignCollect = (LinearLayout) findViewById(R.id.line_admin_signcollect);
         mSignCollect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -177,6 +184,13 @@ public class AdminActivity extends BaseActivity {
                 }
             }
         });
+        mUpdate = (LinearLayout) findViewById(R.id.line_update);
+        mUpdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                checkInternet();
+            }
+        });
     }
 
     // 根据消息更新界面
@@ -202,6 +216,24 @@ public class AdminActivity extends BaseActivity {
                 getSyncInformation();
             } else if (readResult != null && readResult.equalsIgnoreCase("OK"))// 读本地成功
             {
+            }else if (readResult != null && readResult.equalsIgnoreCase("okupdata")) {
+                prodlg.dismiss();
+                String apkpath = (String) bundle.get("apkpath");
+                String apkVersion = (String) bundle.get("apkVersion");
+                updataWarn(apkpath, apkVersion);
+            }else if (readResult != null && readResult.equalsIgnoreCase("noNewVersion")) {
+                prodlg.dismiss();
+                AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+                dialog.setIcon(R.drawable.logo_title).setTitle("提示");
+                dialog.setMessage("没有检测到新版本，请检查新版本是否存在！");
+                dialog.setCancelable(false);
+                dialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                dialog.show();
             }
             return;
         }
@@ -346,5 +378,106 @@ public class AdminActivity extends BaseActivity {
             taskName.setGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL);
             this.addView(taskName, textParams);
         }
+    }
+
+    /**
+     * @Description: 检查网络连接
+     * @author qiaozhili
+     * @date 2020/3/20 17:12
+     * @param
+     * @return
+     */
+    private void checkInternet() {
+        this.prodlg = ProgressDialog.show(this, "检测网络连接中", "请稍侯...");
+        prodlg.setIcon(this.getResources().getDrawable(
+                R.drawable.logo_title));
+        boolean bConnected = NetCheckTool.check(this);// 检测本地网络是否可连接服务
+        if (bConnected == true)	// 联网登录
+        {
+            prodlg.dismiss();
+            starUpdata();
+        }else{		//离线登录
+            alert("无网络连接！");
+            prodlg.cancel();
+        }
+    }
+
+    /**
+     * @param
+     * @return
+     * @Description: 下载apk
+     * @author qiaozhili
+     * @date 2020/3/20 17:40
+     */
+
+    private void starUpdata() {
+        this.prodlg = ProgressDialog.show(this, "版本更新", "正在更新版本");
+        prodlg.setIcon(this.getResources().getDrawable(R.drawable.logo_title));
+        UpdataVersionThread uptataThread = new UpdataVersionThread(this, handler);
+        uptataThread.start();
+    }
+
+    private void updataWarn(final String apkPath, String apkVersion) {
+        AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+        dialog.setIcon(R.drawable.logo_title).setTitle("检测到新版本，是否进行升级？");
+//		dialog.setMessage("version:" + apkVersion);
+        dialog.setCancelable(false);
+        dialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                if (apkPath != "") {
+//					installAPK(apkPath);
+                    install(apkPath);
+                } else {
+                    Toast.makeText(AdminActivity.this, "没查询apk文件，请检查服务端数据！", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        dialog.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+    }
+
+    private void install(String filePath) {
+        Log.i(TAG, "开始执行安装: " + filePath);
+        try {
+            File apkFile = new File(filePath);
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            if (Build.VERSION.SDK_INT >= 24) {
+                Log.w(TAG, "版本大于 N ，开始使用 fileProvider 进行安装");
+                intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                Uri contentUri = FileProvider.getUriForFile(
+                        context
+                        , "com.example.navigationdrawer8bu.fileprovider"
+                        , apkFile);
+                intent.setDataAndType(contentUri, "application/vnd.android.package-archive");
+            } else {
+                Log.w(TAG, "正常进行安装");
+                intent.setDataAndType(Uri.fromFile(apkFile), "application/vnd.android.package-archive");
+            }
+            startActivity(intent);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public void alert(String error) {
+        new AlertDialog.Builder(this).setMessage(error)
+                .setIcon(R.drawable.logo_title).setTitle(R.string.app_name)
+                .setCancelable(false)
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                        prodlg.cancel();
+                    }
+                }).show();
     }
 }

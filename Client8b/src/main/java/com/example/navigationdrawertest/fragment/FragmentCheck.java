@@ -410,139 +410,257 @@ public class FragmentCheck extends Fragment {
 			if (convertView == null) {
 				LayoutInflater inflater = LayoutInflater.from(context);
 				holder = new ViewHolder();
-				if(layer == 4){
-					convertView = inflater.inflate(R.layout.tree_item, null);
-					holder.tv_name = (TextView) convertView.findViewById(R.id.txt_tree_name);
-					holder.tv_width = (TextView) convertView.findViewById(R.id.txt_tree_width);
-					holder.iv_left = (ImageView) convertView.findViewById(R.id.img_tree_left);
-					holder.check_button = (Button) convertView.findViewById(R.id.check_button);
-					holder.read_button = (Button) convertView.findViewById(R.id.read_button);
-					if (broTaskId != null) {
-						if (broTaskId.equals("")) {
+				if (fieldType.equals("1")) {
+					//产品验收树结构
+					if (layer == 4) {
+						convertView = inflater.inflate(R.layout.tree_item, null);
+						holder.tv_name = (TextView) convertView.findViewById(R.id.txt_tree_name);
+						holder.tv_width = (TextView) convertView.findViewById(R.id.txt_tree_width);
+						holder.iv_left = (ImageView) convertView.findViewById(R.id.img_tree_left);
+						holder.check_button = (Button) convertView.findViewById(R.id.check_button);
+						holder.read_button = (Button) convertView.findViewById(R.id.read_button);
+						if (broTaskId != null) {
+							if (broTaskId.equals("")) {
+								holder.check_button.setVisibility(View.INVISIBLE);
+							}
+						} else if (broTaskId == null) {
 							holder.check_button.setVisibility(View.INVISIBLE);
 						}
-					} else if (broTaskId == null){
-						holder.check_button.setVisibility(View.INVISIBLE);
-					}
-					holder.check_button.setOnClickListener(new OnClickListener(){
-						@Override
-						public void onClick(View v) {
-							// TODO Auto-generated method stub
-							clicktaskid = nodeList.get(position).getId();
-							showSweetAlertDialog(clicktaskid, NodeButtonEnum.CHECKBUTTON);
-						}
-					});
-					holder.read_button.setOnClickListener(new OnClickListener(){
-						@Override
-						public void onClick(View v) {
-							// TODO Auto-generated method stub
-							clicktaskid = nodeList.get(position).getId();
-							showSweetAlertDialog(clicktaskid, NodeButtonEnum.READBUTTON);
-						}
-					});
-				} else if (layer == 3) {
-					convertView = inflater.inflate(R.layout.tree_item_init_copy, null);
-					holder.tv_name = (TextView) convertView.findViewById(R.id.init_txt_tree_name);
-					holder.tv_width = (TextView) convertView.findViewById(R.id.init_txt_tree_width);
-					holder.iv_left = (ImageView) convertView.findViewById(R.id.init_img_tree_left);
-					holder.ch_button = (Button) convertView.findViewById(R.id.cehua_button);
-					final List<Task> finalTaskList = taskList;
-					if (finalTaskList != null) {
-
-						holder.ch_button.setOnClickListener(new OnClickListener() {
+						holder.check_button.setOnClickListener(new OnClickListener() {
 							@Override
 							public void onClick(View v) {
-								warnInfo(finalTaskList);
+								// TODO Auto-generated method stub
+								clicktaskid = nodeList.get(position).getId();
+								showSweetAlertDialog(clicktaskid, NodeButtonEnum.CHECKBUTTON);
 							}
 						});
-					} else {
-						Toast.makeText(getActivity(), "无策划模板，请检查数据。", Toast.LENGTH_LONG).show();
-					}
-				} else if (layer == 2) {
-					convertView = inflater.inflate(R.layout.tree_item_init, null);
-					holder.tv_name = (TextView) convertView.findViewById(R.id.init_txt_tree_name);
-					holder.tv_width = (TextView) convertView.findViewById(R.id.init_txt_tree_width);
-					holder.iv_left = (ImageView) convertView.findViewById(R.id.init_img_tree_left);
-				} else if (layer == 1) {
-					convertView = inflater.inflate(R.layout.tree_item_init1, null);
-					holder.tv_name = (TextView) convertView.findViewById(R.id.init_txt_tree_name);
-					holder.tv_width = (TextView) convertView.findViewById(R.id.init_txt_tree_width);
-					holder.iv_left = (ImageView) convertView.findViewById(R.id.init_img_tree_left);
+						holder.read_button.setOnClickListener(new OnClickListener() {
+							@Override
+							public void onClick(View v) {
+								// TODO Auto-generated method stub
+								clicktaskid = nodeList.get(position).getId();
+								showSweetAlertDialog(clicktaskid, NodeButtonEnum.READBUTTON);
+							}
+						});
+					} else if (layer == 3) {
+						convertView = inflater.inflate(R.layout.tree_item_init_copy, null);
+						holder.tv_name = (TextView) convertView.findViewById(R.id.init_txt_tree_name);
+						holder.tv_width = (TextView) convertView.findViewById(R.id.init_txt_tree_width);
+						holder.iv_left = (ImageView) convertView.findViewById(R.id.init_img_tree_left);
+						holder.ch_button = (Button) convertView.findViewById(R.id.cehua_button);
+						final List<Task> finalTaskList = taskList;
+						if (finalTaskList != null) {
 
-				} else  if (layer == 0) {
-					convertView = inflater.inflate(R.layout.tree_item_init_null, null);
-					holder.tv_name = (TextView) convertView.findViewById(R.id.init_txt_tree_name);
-					holder.tv_width = (TextView) convertView.findViewById(R.id.init_txt_tree_width);
-					holder.iv_left = (ImageView) convertView.findViewById(R.id.init_img_tree_left);
+							holder.ch_button.setOnClickListener(new OnClickListener() {
+								@Override
+								public void onClick(View v) {
+									warnInfo(finalTaskList);
+								}
+							});
+						} else {
+							Toast.makeText(getActivity(), "无策划模板，请检查数据。", Toast.LENGTH_LONG).show();
+						}
+					} else if (layer == 2) {
+						convertView = inflater.inflate(R.layout.tree_item_init, null);
+						holder.tv_name = (TextView) convertView.findViewById(R.id.init_txt_tree_name);
+						holder.tv_width = (TextView) convertView.findViewById(R.id.init_txt_tree_width);
+						holder.iv_left = (ImageView) convertView.findViewById(R.id.init_img_tree_left);
+					} else if (layer == 1) {
+						convertView = inflater.inflate(R.layout.tree_item_init1, null);
+						holder.tv_name = (TextView) convertView.findViewById(R.id.init_txt_tree_name);
+						holder.tv_width = (TextView) convertView.findViewById(R.id.init_txt_tree_width);
+						holder.iv_left = (ImageView) convertView.findViewById(R.id.init_img_tree_left);
+
+					} else if (layer == 0) {
+						convertView = inflater.inflate(R.layout.tree_item_init_null, null);
+						holder.tv_name = (TextView) convertView.findViewById(R.id.init_txt_tree_name);
+						holder.tv_width = (TextView) convertView.findViewById(R.id.init_txt_tree_width);
+						holder.iv_left = (ImageView) convertView.findViewById(R.id.init_img_tree_left);
+					}
+				} else {
+					//武器所检树结构
+					if (layer == 2) {
+						convertView = inflater.inflate(R.layout.tree_item, null);
+						holder.tv_name = (TextView) convertView.findViewById(R.id.txt_tree_name);
+						holder.tv_width = (TextView) convertView.findViewById(R.id.txt_tree_width);
+						holder.iv_left = (ImageView) convertView.findViewById(R.id.img_tree_left);
+						holder.check_button = (Button) convertView.findViewById(R.id.check_button);
+						holder.read_button = (Button) convertView.findViewById(R.id.read_button);
+						if (broTaskId != null) {
+							if (broTaskId.equals("")) {
+								holder.check_button.setVisibility(View.INVISIBLE);
+							}
+						} else if (broTaskId == null) {
+							holder.check_button.setVisibility(View.INVISIBLE);
+						}
+						holder.check_button.setOnClickListener(new OnClickListener() {
+							@Override
+							public void onClick(View v) {
+								// TODO Auto-generated method stub
+								clicktaskid = nodeList.get(position).getId();
+								showSweetAlertDialog(clicktaskid, NodeButtonEnum.CHECKBUTTON);
+							}
+						});
+						holder.read_button.setOnClickListener(new OnClickListener() {
+							@Override
+							public void onClick(View v) {
+								// TODO Auto-generated method stub
+								clicktaskid = nodeList.get(position).getId();
+								showSweetAlertDialog(clicktaskid, NodeButtonEnum.READBUTTON);
+							}
+						});
+					} else if (layer == 1) {
+						convertView = inflater.inflate(R.layout.tree_item_init_copy, null);
+						holder.tv_name = (TextView) convertView.findViewById(R.id.init_txt_tree_name);
+						holder.tv_width = (TextView) convertView.findViewById(R.id.init_txt_tree_width);
+						holder.iv_left = (ImageView) convertView.findViewById(R.id.init_img_tree_left);
+						holder.ch_button = (Button) convertView.findViewById(R.id.cehua_button);
+						final List<Task> finalTaskList = taskList;
+						if (finalTaskList != null) {
+
+							holder.ch_button.setOnClickListener(new OnClickListener() {
+								@Override
+								public void onClick(View v) {
+									warnInfo(finalTaskList);
+								}
+							});
+						} else {
+							Toast.makeText(getActivity(), "无策划模板，请检查数据。", Toast.LENGTH_LONG).show();
+						}
+					} else if (layer == 0) {
+						convertView = inflater.inflate(R.layout.tree_item_init_null, null);
+						holder.tv_name = (TextView) convertView.findViewById(R.id.init_txt_tree_name);
+						holder.tv_width = (TextView) convertView.findViewById(R.id.init_txt_tree_width);
+						holder.iv_left = (ImageView) convertView.findViewById(R.id.init_img_tree_left);
+					}
 				}
 				convertView.setTag(holder);
 			}
 			else {
 				LayoutInflater inflater = LayoutInflater.from(context);
 				holder = new ViewHolder();
-				if(layer == 4){
-					convertView = inflater.inflate(R.layout.tree_item, null);
-					holder.tv_name = (TextView) convertView.findViewById(R.id.txt_tree_name);
-					holder.tv_width = (TextView) convertView.findViewById(R.id.txt_tree_width);
-					holder.iv_left = (ImageView) convertView.findViewById(R.id.img_tree_left);
-					holder.check_button = (Button) convertView.findViewById(R.id.check_button);
-					holder.read_button = (Button) convertView.findViewById(R.id.read_button);
-					if (broTaskId != null) {
-						if (broTaskId.equals("")) {
+				if (fieldType.equals("1")) {
+					//产品验收树结构
+					if (layer == 4) {
+						convertView = inflater.inflate(R.layout.tree_item, null);
+						holder.tv_name = (TextView) convertView.findViewById(R.id.txt_tree_name);
+						holder.tv_width = (TextView) convertView.findViewById(R.id.txt_tree_width);
+						holder.iv_left = (ImageView) convertView.findViewById(R.id.img_tree_left);
+						holder.check_button = (Button) convertView.findViewById(R.id.check_button);
+						holder.read_button = (Button) convertView.findViewById(R.id.read_button);
+						if (broTaskId != null) {
+							if (broTaskId.equals("")) {
+								holder.check_button.setVisibility(View.INVISIBLE);
+							}
+						} else if (broTaskId == null) {
 							holder.check_button.setVisibility(View.INVISIBLE);
 						}
-					} else if (broTaskId == null){
-						holder.check_button.setVisibility(View.INVISIBLE);
-					}
-					holder.check_button.setOnClickListener(new OnClickListener(){
-						@Override
-						public void onClick(View v) {
-							// TODO Auto-generated method stub
-							clicktaskid = nodeList.get(position).getId();
-							showSweetAlertDialog(clicktaskid, NodeButtonEnum.CHECKBUTTON);
-						}
-					});
-					holder.read_button.setOnClickListener(new OnClickListener(){
-						@Override
-						public void onClick(View v) {
-							// TODO Auto-generated method stub
-							clicktaskid = nodeList.get(position).getId();
-							showSweetAlertDialog(clicktaskid, NodeButtonEnum.READBUTTON);
-						}
-					});
-				} else if (layer == 3) {
-					convertView = inflater.inflate(R.layout.tree_item_init_copy, null);
-					holder.tv_name = (TextView) convertView.findViewById(R.id.init_txt_tree_name);
-					holder.tv_width = (TextView) convertView.findViewById(R.id.init_txt_tree_width);
-					holder.iv_left = (ImageView) convertView.findViewById(R.id.init_img_tree_left);
-					holder.ch_button = (Button) convertView.findViewById(R.id.cehua_button);
-					final List<Task> finalTaskList = taskList;
-					if (finalTaskList != null) {
-
-						holder.ch_button.setOnClickListener(new OnClickListener() {
+						holder.check_button.setOnClickListener(new OnClickListener() {
 							@Override
 							public void onClick(View v) {
-								warnInfo(finalTaskList);
+								// TODO Auto-generated method stub
+								clicktaskid = nodeList.get(position).getId();
+								showSweetAlertDialog(clicktaskid, NodeButtonEnum.CHECKBUTTON);
 							}
 						});
-					} else {
-						Toast.makeText(getActivity(), "无策划模板，请检查数据。", Toast.LENGTH_LONG).show();
+						holder.read_button.setOnClickListener(new OnClickListener() {
+							@Override
+							public void onClick(View v) {
+								// TODO Auto-generated method stub
+								clicktaskid = nodeList.get(position).getId();
+								showSweetAlertDialog(clicktaskid, NodeButtonEnum.READBUTTON);
+							}
+						});
+					} else if (layer == 3) {
+						convertView = inflater.inflate(R.layout.tree_item_init_copy, null);
+						holder.tv_name = (TextView) convertView.findViewById(R.id.init_txt_tree_name);
+						holder.tv_width = (TextView) convertView.findViewById(R.id.init_txt_tree_width);
+						holder.iv_left = (ImageView) convertView.findViewById(R.id.init_img_tree_left);
+						holder.ch_button = (Button) convertView.findViewById(R.id.cehua_button);
+						final List<Task> finalTaskList = taskList;
+						if (finalTaskList != null) {
+
+							holder.ch_button.setOnClickListener(new OnClickListener() {
+								@Override
+								public void onClick(View v) {
+									warnInfo(finalTaskList);
+								}
+							});
+						} else {
+							Toast.makeText(getActivity(), "无策划模板，请检查数据。", Toast.LENGTH_LONG).show();
+						}
+					} else if (layer == 2) {
+						convertView = inflater.inflate(R.layout.tree_item_init, null);
+						holder.tv_name = (TextView) convertView.findViewById(R.id.init_txt_tree_name);
+						holder.tv_width = (TextView) convertView.findViewById(R.id.init_txt_tree_width);
+						holder.iv_left = (ImageView) convertView.findViewById(R.id.init_img_tree_left);
+					} else if (layer == 1) {
+						convertView = inflater.inflate(R.layout.tree_item_init1, null);
+						holder.tv_name = (TextView) convertView.findViewById(R.id.init_txt_tree_name);
+						holder.tv_width = (TextView) convertView.findViewById(R.id.init_txt_tree_width);
+						holder.iv_left = (ImageView) convertView.findViewById(R.id.init_img_tree_left);
+					} else if (layer == 0) {
+						convertView = inflater.inflate(R.layout.tree_item_init_null, null);
+						holder.tv_name = (TextView) convertView.findViewById(R.id.init_txt_tree_name);
+						holder.tv_width = (TextView) convertView.findViewById(R.id.init_txt_tree_width);
+						holder.iv_left = (ImageView) convertView.findViewById(R.id.init_img_tree_left);
 					}
-				} else if (layer == 2) {
-					convertView = inflater.inflate(R.layout.tree_item_init, null);
-					holder.tv_name = (TextView) convertView.findViewById(R.id.init_txt_tree_name);
-					holder.tv_width = (TextView) convertView.findViewById(R.id.init_txt_tree_width);
-					holder.iv_left = (ImageView) convertView.findViewById(R.id.init_img_tree_left);
-				} else if (layer == 1) {
-					convertView = inflater.inflate(R.layout.tree_item_init1, null);
-					holder.tv_name = (TextView) convertView.findViewById(R.id.init_txt_tree_name);
-					holder.tv_width = (TextView) convertView.findViewById(R.id.init_txt_tree_width);
-					holder.iv_left = (ImageView) convertView.findViewById(R.id.init_img_tree_left);
-				} else  if (layer == 0) {
-					convertView = inflater.inflate(R.layout.tree_item_init_null, null);
-					holder.tv_name = (TextView) convertView.findViewById(R.id.init_txt_tree_name);
-					holder.tv_width = (TextView) convertView.findViewById(R.id.init_txt_tree_width);
-					holder.iv_left = (ImageView) convertView.findViewById(R.id.init_img_tree_left);
+				} else {
+					//武器所检树结构
+					if (layer == 2) {
+						convertView = inflater.inflate(R.layout.tree_item, null);
+						holder.tv_name = (TextView) convertView.findViewById(R.id.txt_tree_name);
+						holder.tv_width = (TextView) convertView.findViewById(R.id.txt_tree_width);
+						holder.iv_left = (ImageView) convertView.findViewById(R.id.img_tree_left);
+						holder.check_button = (Button) convertView.findViewById(R.id.check_button);
+						holder.read_button = (Button) convertView.findViewById(R.id.read_button);
+						if (broTaskId != null) {
+							if (broTaskId.equals("")) {
+								holder.check_button.setVisibility(View.INVISIBLE);
+							}
+						} else if (broTaskId == null) {
+							holder.check_button.setVisibility(View.INVISIBLE);
+						}
+						holder.check_button.setOnClickListener(new OnClickListener() {
+							@Override
+							public void onClick(View v) {
+								// TODO Auto-generated method stub
+								clicktaskid = nodeList.get(position).getId();
+								showSweetAlertDialog(clicktaskid, NodeButtonEnum.CHECKBUTTON);
+							}
+						});
+						holder.read_button.setOnClickListener(new OnClickListener() {
+							@Override
+							public void onClick(View v) {
+								// TODO Auto-generated method stub
+								clicktaskid = nodeList.get(position).getId();
+								showSweetAlertDialog(clicktaskid, NodeButtonEnum.READBUTTON);
+							}
+						});
+					} else if (layer == 1) {
+						convertView = inflater.inflate(R.layout.tree_item_init_copy, null);
+						holder.tv_name = (TextView) convertView.findViewById(R.id.init_txt_tree_name);
+						holder.tv_width = (TextView) convertView.findViewById(R.id.init_txt_tree_width);
+						holder.iv_left = (ImageView) convertView.findViewById(R.id.init_img_tree_left);
+						holder.ch_button = (Button) convertView.findViewById(R.id.cehua_button);
+						final List<Task> finalTaskList = taskList;
+						if (finalTaskList != null) {
+
+							holder.ch_button.setOnClickListener(new OnClickListener() {
+								@Override
+								public void onClick(View v) {
+									warnInfo(finalTaskList);
+								}
+							});
+						} else {
+							Toast.makeText(getActivity(), "无策划模板，请检查数据。", Toast.LENGTH_LONG).show();
+						}
+					} else if (layer == 0) {
+						convertView = inflater.inflate(R.layout.tree_item_init_null, null);
+						holder.tv_name = (TextView) convertView.findViewById(R.id.init_txt_tree_name);
+						holder.tv_width = (TextView) convertView.findViewById(R.id.init_txt_tree_width);
+						holder.iv_left = (ImageView) convertView.findViewById(R.id.init_img_tree_left);
+					}
 				}
 				convertView.setTag(holder);
 			}

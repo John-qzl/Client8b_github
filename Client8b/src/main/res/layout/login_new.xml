@@ -148,7 +148,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/update_select"
-                android:src="@drawable/updata1" />
+                android:src="@drawable/updata1"
+                android:visibility="gone"/>
         </LinearLayout>
 
         <TextView

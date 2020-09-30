@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/gray">
 
     <RelativeLayout
         android:id="@+id/title_bar"
@@ -102,26 +103,104 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:gravity="center">
+        android:layout_margin="100dp"
+        >
 
-        <Button
-            android:id="@+id/admin_signcollect"
-            android:layout_width="120dp"
-            android:layout_height="60dp"
-            android:background="@color/light_green"
-            android:text="电子签章收集"
-            android:textColor="@color/White"
-            android:textSize="@dimen/size16"/>
-        <Button
-            android:id="@+id/admin_delAll"
-            android:layout_width="120dp"
-            android:layout_height="60dp"
-            android:layout_marginLeft="18dp"
-            android:background="@color/bt_copy"
-            android:text="清空数据"
-            android:textColor="@color/White"
-            android:textSize="@dimen/size16"/>
+        <LinearLayout
+            android:id="@+id/line_admin_signcollect"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:background="@color/White">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/sign_big"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:textColor="@color/text_color"
+                android:textSize="@dimen/size16"
+                android:text="电子签章收集"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/line_admin_delAll"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:background="@color/White"
+            android:layout_marginLeft="1dp">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/delete_big"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:textColor="@color/text_color"
+                android:textSize="@dimen/size16"
+                android:text="清空数据"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/line_update"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:background="@color/White"
+            android:layout_marginLeft="1dp">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/update_big"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:textColor="@color/text_color"
+                android:textSize="@dimen/size16"
+                android:text="版本升级"/>
+        </LinearLayout>
     </LinearLayout>
+
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:orientation="horizontal"-->
+        <!--android:gravity="center">-->
+
+        <!--<Button-->
+            <!--android:id="@+id/admin_signcollect"-->
+            <!--android:layout_width="120dp"-->
+            <!--android:layout_height="60dp"-->
+            <!--android:background="@color/light_green"-->
+            <!--android:text="电子签章收集"-->
+            <!--android:textColor="@color/White"-->
+            <!--android:textSize="@dimen/size16"/>-->
+        <!--<Button-->
+            <!--android:id="@+id/admin_delAll"-->
+            <!--android:layout_width="120dp"-->
+            <!--android:layout_height="60dp"-->
+            <!--android:layout_marginLeft="18dp"-->
+            <!--android:background="@color/bt_copy"-->
+            <!--android:text="清空数据"-->
+            <!--android:textColor="@color/White"-->
+            <!--android:textSize="@dimen/size16"/>-->
+    <!--</LinearLayout>-->
 
 </LinearLayout>
