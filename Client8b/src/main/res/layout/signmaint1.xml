@@ -176,7 +176,17 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/signtable_scroll"
-                    android:layout_marginTop="20dp" >
+                    android:layout_marginTop="20dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="10dp"
+                        android:gravity="center_vertical"
+                        android:text="签署请注意核对当前时间"
+                        android:textColor="@color/red_btn_bg_color"
+                        android:textSize="@dimen/content"/>
 
                     <ListView
                         android:id="@+id/sign_mylistview_3"

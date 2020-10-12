@@ -257,13 +257,14 @@ public class FragmentCheck extends Fragment {
 				List<BCRelation> bcRelationList = DataSupport.where("ssxh = ?", proEntity.getRwid()).find(BCRelation.class);
 				if (bcRelationList.size() > 0) {
 					for (int k = 0; k < bcRelationList.size(); k++) {
-						TreeNode node = new DepartmentNode(Long.valueOf(bcRelationList.get(k).getChid()), bcRelationList.get(k).getChname(), "0", rootNode, 1);
-
 						List<Task> BCtaskList = DataSupport.where("location = ? and chId =?", "1", bcRelationList.get(k).getChid()).find(Task.class);;
-						for (int loop = 0; loop < BCtaskList.size(); loop++) {
-							node.add(new UserNode(Long.valueOf(BCtaskList.get(loop).getTaskid()), BCtaskList.get(loop).getTaskname(), node, 2));
+						if (BCtaskList.size() > 0) {
+							TreeNode node = new DepartmentNode(Long.valueOf(bcRelationList.get(k).getChid()), bcRelationList.get(k).getChname(), "0", rootNode, 1);
+							for (int loop = 0; loop < BCtaskList.size(); loop++) {
+								node.add(new UserNode(Long.valueOf(BCtaskList.get(loop).getTaskid()), BCtaskList.get(loop).getTaskname(), node, 2));
+							}
+							rootNode.add(node);
 						}
-						rootNode.add(node);
 					}
 				}
 			}

@@ -5,6 +5,8 @@ import java.io.File;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
+import android.support.v4.content.FileProvider;
 
 public class ThridToolUtils {
 	
@@ -39,14 +41,25 @@ public class ThridToolUtils {
 	 */
 	public static void openFile(File file, Context context){
 	    //Uri uri = Uri.parse("file://"+file.getAbsolutePath());
-	    Intent intent = new Intent();
-	    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-	    //设置intent的Action属性
-	    intent.setAction(Intent.ACTION_VIEW);
-	    //获取文件file的MIME类型
+//	    Intent intent = new Intent();
+//	    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//	    //设置intent的Action属性
+//	    intent.setAction(Intent.ACTION_VIEW);
+//	    //获取文件file的MIME类型
 	    String type = getMIMEType(file);
-	    //设置intent的data和Type属性。
-	    intent.setDataAndType(/*uri*/Uri.fromFile(file), type);
+//	    //设置intent的data和Type属性。
+//	    intent.setDataAndType(/*uri*/Uri.fromFile(file), type);
+
+		Intent intent = new Intent(Intent.ACTION_VIEW);
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+			intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+			Uri uri = FileProvider.getUriForFile(context, context.getPackageName() + ".fileprovider", file);
+			intent.setDataAndType(uri, type);
+		} else {
+			intent.setDataAndType(Uri.fromFile(file), type);
+		}
+
 	    //跳转
 	    try{
 	    	context.startActivity(intent);
@@ -113,7 +126,8 @@ public class ThridToolUtils {
 	    { ".css", "text/css" },  
 	    { ".cur", "application/octet-stream" },  
 	    { ".doc", "application/msword" },  
-	    { ".dcm", "x-lml/x-evm" },  
+	    { ".docx", "application/msword" },
+	    { ".dcm", "x-lml/x-evm" },
 	    { ".dcr", "application/x-director" },  
 	    { ".dcx", "image/x-dcx" },  
 	    { ".dhtml", "text/html" },  
@@ -475,8 +489,9 @@ public class ThridToolUtils {
 	    { ".xlc", "application/vnd.ms-excel" },  
 	    { ".xll", "application/x-excel" },  
 	    { ".xlm", "application/vnd.ms-excel" },  
-	    { ".xls", "application/vnd.ms-excel" },  
-	    { ".xlt", "application/vnd.ms-excel" },  
+	    { ".xls", "application/vnd.ms-excel" },
+	    { ".xlsx", "application/vnd.ms-excel" },
+	    { ".xlt", "application/vnd.ms-excel" },
 	    { ".xlw", "application/vnd.ms-excel" },  
 	    { ".xm", "audio/x-mod" },  
 	    { ".xml", "text/xml" },  

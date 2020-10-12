@@ -3,6 +3,6 @@
     <paths>
         <external-path
             path=""
-            name="camera.photos" />
+            name="external" />
     </paths>
 </resources>
