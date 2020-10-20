@@ -532,8 +532,7 @@ public class SyncWorkThread extends Thread {
 				errorMessage = code + "错误";
 				return false;
 			}
-			String xmlContent = EntityUtils.toString(response.getEntity(),
-					"utf-8");
+			String xmlContent = EntityUtils.toString(response.getEntity(), "utf-8");
 			boolean isUpdateRight = this.updatemmcList(xmlContent); // 传过来的是MMC的XML列表
 			if (isUpdateRight == false) {
 				return false;
@@ -697,18 +696,25 @@ public class SyncWorkThread extends Thread {
 				String CHName = pro[i].split("\\,")[1];
 				String productId = pro[i].split("\\,")[2];//所属型号ID
 				String productName = pro[i].split("\\,")[3];//所属型号ID
+				String fieldType = "";
+				if (CHName.contains("BCSY")) {
+					fieldType = "3";
+				} else if (CHName.contains("WQSJ")) {
+					fieldType = "2";
+				}
 				BCRelation bcRW = new BCRelation();
 				List<BCRelation> bcRelationList = DataSupport.findAll(BCRelation.class);
 				StringBuffer relationStr = new StringBuffer();
 				for (BCRelation bcRelation : bcRelationList) {
-					relationStr.append(bcRelation.getChid()).append(",");
+					relationStr.append(bcRelation.getChid()+bcRelation.getSyfzrID()).append(",");
 				}
-				if (!relationStr.toString().contains(CHId)) {
+				if (!relationStr.toString().contains(CHId + user.getUserid())) {
 					bcRW.setChid(CHId);
 					bcRW.setChname(CHName);
 					bcRW.setSsxh(productId);
 					bcRW.setXhdh(productName);
 					bcRW.setSyfzrID(user.getUserid());
+					bcRW.setFieldType(fieldType);
 					syncList.add(bcRW.getChid() + "---BCRelation表保存成功");
 					bcRW.save();
 				}
@@ -1112,7 +1118,7 @@ public class SyncWorkThread extends Thread {
 	}
 
 
-	private Task readTask(Element root, Task task, String state, Map<String, String> map) {
+	private Task readTask(Element root, Task task, String state, Map<String, String> map, String fieldType) {
 		String id = Settings.System.getString(context.getContentResolver(), Settings.System.ANDROID_ID);
 		if (state.equals("finish")) { // 已完成状态
 			task.setLocation(4);
@@ -1146,6 +1152,7 @@ public class SyncWorkThread extends Thread {
 		task.setIsfinish("false"); 						// 2016-4-15 表格是否完成标记
 		task.setInitStatue("unfinish");			// 2016-7-29 09:40:27
 		task.setDeviceCode(id);
+		task.setFieldType(fieldType);
 //		task.setTablesize(root.getAttribute("tablesize"));	//表格拆分标记
 
 		readRw(root); // 保存任务--岗位--表格关系表
@@ -1213,7 +1220,7 @@ public class SyncWorkThread extends Thread {
 		// task.setConditions(conditionList);
 	}
 
-	public Task invertXMLtoTask(String taskXMLContent, String state) {
+	public Task invertXMLtoTask(String taskXMLContent, String state, String fieldType) {
 		// Task retTask = new Task();
 		DocumentBuilderFactory docBuilderFactory = null;
 		DocumentBuilder docBuilder = null;
@@ -1233,7 +1240,7 @@ public class SyncWorkThread extends Thread {
 			 */
 			Task task = new Task();
 			Map<String, String> map = new HashMap<>();
-			readTask(root, task, state, map);
+			readTask(root, task, state, map, fieldType);
 			// 下载签署图片
 			if (state.equals("finish")) {
 //				map = downloadSignPhoto(task, root);
@@ -1246,7 +1253,7 @@ public class SyncWorkThread extends Thread {
 		}
 	}
 
-	private boolean downloadUnfinish(String tableIDs, String tempId, String fieldTye) { // tableIDs是待下载表格实例的ID，仅有一个
+	private boolean downloadUnfinish(String tableIDs, String tempId, String fieldType) { // tableIDs是待下载表格实例的ID，仅有一个
 		// 1,gettask
 		// 2,gethtml
 		// 3,getpic
@@ -1264,7 +1271,7 @@ public class SyncWorkThread extends Thread {
 //			nameValuePairs.add(new BasicNameValuePair("taskversion", Integer
 //					.parseInt(version) + 1 + ""));
 			nameValuePairs.add(new BasicNameValuePair("tempId", tempId));
-			nameValuePairs.add(new BasicNameValuePair("fieldTye", fieldTye));
+			nameValuePairs.add(new BasicNameValuePair("fieldTye", fieldType));
 			getTaskPostmethod
 					.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 			response = getTaskClient.execute(getTaskPostmethod);
@@ -1275,7 +1282,7 @@ public class SyncWorkThread extends Thread {
 			String taskXMLContent = EntityUtils.toString(response.getEntity(),
 					"utf-8");
 			syncList.add("2,我的任务---检查表格下载列表");
-			Task downloadtask = invertXMLtoTask(taskXMLContent, "unfinish");
+			Task downloadtask = invertXMLtoTask(taskXMLContent, "unfinish",fieldType);
 			if (downloadtask != null) { // 如果表格实例XML保存到数据库，就下载该表格的HTML表格
 				downloadHtml(downloadtask);
 				updateInformation("下载", downloadtask.getTaskname()
@@ -2568,7 +2575,7 @@ public class SyncWorkThread extends Thread {
 			syncList.add("6,我的任务---检查表格下载列表");
 //			invertXMLtoTask(taskXMLContent, "finish");
 
-			Task downloadtask = invertXMLtoTask(taskXMLContent, "finish");
+			Task downloadtask = invertXMLtoTask(taskXMLContent, "finish", "1");
 			if (downloadtask != null) {
 				downloadHtml(downloadtask);
 				downloadopphoto(downloadtask);

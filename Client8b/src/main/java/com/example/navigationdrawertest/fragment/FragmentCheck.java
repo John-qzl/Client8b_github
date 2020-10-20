@@ -94,15 +94,17 @@ public class FragmentCheck extends Fragment {
 	private long clicktaskid;
 	private NodeButtonEnum buttontype;
 	private RwRelation proEntity;				//传递过来的项目树节点
+	private BCRelation BCproEntity;
 	private static User user;
 	private ProgressDialog prodlg;
 	private AlertDialog.Builder dialog;
 	private AlertDialog alertDialog3; //多选框
 	private String fieldType = "";  //1产品验收  2武器所检  3靶场试验
 
-	public FragmentCheck(RwRelation proEntity, String fieldType){
+	public FragmentCheck(RwRelation proEntity, String fieldType, BCRelation BCproEntity){
 		this.proEntity = proEntity;
 		this.fieldType = fieldType;
+		this.BCproEntity = BCproEntity;
 	}
 
 	@Override
@@ -143,7 +145,13 @@ public class FragmentCheck extends Fragment {
 		nodeList.clear();
 
 		String testteamStr = user.getTtidandname();
-		List<Task> taskList_rw = DataSupport.where("location = ? and xhId =?", "1",proEntity.getRwid()).find(Task.class);
+		String xhId = "";
+		if (fieldType.equals("1")) {
+			xhId = proEntity.getRwid();
+		} else {
+			xhId = BCproEntity.getSsxh();
+		}
+		List<Task> taskList_rw = DataSupport.where("location = ? and xhId =?  and fieldType=?", "1",xhId,fieldType).find(Task.class);
 		if(taskList_rw.size() != 0){
 			rwList.clear();
 			for (int i = 0; i < taskList_rw.size(); i++) {
@@ -164,7 +172,16 @@ public class FragmentCheck extends Fragment {
 					rwList.add(rw);
 				}
 			}
-			rootNode = new DepartmentNode(Long.valueOf(proEntity.getRwid()), proEntity.getRwname(), "0", null, 0);
+			String rwName = "";
+			String rwId = "";
+			if (fieldType.equals("1")) {
+				rwId = proEntity.getRwid();
+				rwName = proEntity.getRwname();
+			} else {
+				rwId = BCproEntity.getSsxh();
+				rwName = BCproEntity.getXhdh();
+			}
+			rootNode = new DepartmentNode(Long.valueOf(rwId), rwName, "0", null, 0);
 			//产品验收领域树结构
 			if (fieldType.equals("1")) {
 				//3,获取所有的岗位实例-path
@@ -254,17 +271,26 @@ public class FragmentCheck extends Fragment {
 			}
 			//其他领域树结构
 			else {
-				List<BCRelation> bcRelationList = DataSupport.where("ssxh = ?", proEntity.getRwid()).find(BCRelation.class);
+				List<BCRelation> bcRelationList = new ArrayList<>();
+				if (fieldType.equals("3")) {
+					bcRelationList = DataSupport.where("ssxh = ? and fieldType = ?", BCproEntity.getSsxh(), "3").find(BCRelation.class);
+				} else if (fieldType.equals("2")) {
+					bcRelationList = DataSupport.where("ssxh = ? and fieldType = ?", BCproEntity.getSsxh(), "2").find(BCRelation.class);
+				}
 				if (bcRelationList.size() > 0) {
+					StringBuffer stringBuffer = new StringBuffer();
 					for (int k = 0; k < bcRelationList.size(); k++) {
-						List<Task> BCtaskList = DataSupport.where("location = ? and chId =?", "1", bcRelationList.get(k).getChid()).find(Task.class);;
-						if (BCtaskList.size() > 0) {
-							TreeNode node = new DepartmentNode(Long.valueOf(bcRelationList.get(k).getChid()), bcRelationList.get(k).getChname(), "0", rootNode, 1);
-							for (int loop = 0; loop < BCtaskList.size(); loop++) {
-								node.add(new UserNode(Long.valueOf(BCtaskList.get(loop).getTaskid()), BCtaskList.get(loop).getTaskname(), node, 2));
+						if (!stringBuffer.toString().contains(bcRelationList.get(k).getChid())) {
+							List<Task> BCtaskList = DataSupport.where("location = ? and chId =?", "1", bcRelationList.get(k).getChid()).find(Task.class);;
+							if (BCtaskList.size() > 0) {
+								TreeNode node = new DepartmentNode(Long.valueOf(bcRelationList.get(k).getChid()), bcRelationList.get(k).getChname(), "0", rootNode, 1);
+								for (int loop = 0; loop < BCtaskList.size(); loop++) {
+									node.add(new UserNode(Long.valueOf(BCtaskList.get(loop).getTaskid()), BCtaskList.get(loop).getTaskname(), node, 2));
+								}
+								rootNode.add(node);
 							}
-							rootNode.add(node);
 						}
+						stringBuffer.append(bcRelationList.get(k).getChid());
 					}
 				}
 			}
@@ -342,7 +368,13 @@ public class FragmentCheck extends Fragment {
 					public void onClick(DialogInterface dialog, int which) {
 						dialog.dismiss();
 						Intent intent1 = new Intent(getActivity(), MainActivity1.class);
-						intent1.putExtra("fieldType", "1");
+						if (fieldType.equals("1")) {
+							intent1.putExtra("fieldType", "1");
+						} else if (fieldType.equals("2")){
+							intent1.putExtra("fieldType", "2");
+						} else {
+							intent1.putExtra("fieldType", "3");
+						}
 						startActivity(intent1);
 
 					}
@@ -399,9 +431,12 @@ public class FragmentCheck extends Fragment {
 			if (layer == 3) {
 				Long chId = nodeList.get(position).getId();
 				taskList = DataSupport.where("chid = ? and location=? and IsBrother = ?", String.valueOf(chId), "1", "0").find(Task.class);
+			} else if (layer == 1 && !fieldType.equals("1")) {
+				Long chId = nodeList.get(position).getId();
+				taskList = DataSupport.where("chid = ? and location=? and IsBrother = ?", String.valueOf(chId), "1", "0").find(Task.class);
 			}
 			String broTaskId = "";
-			if (layer == 4) {
+			if (layer == 4 || (layer == 2 && !fieldType.equals("1"))) {
 				List<Task> taskList1 = DataSupport.where("taskid = ?", String.valueOf(nodeList.get(position).getId())).find(Task.class);
 				if (taskList1.size() > 0) {
 					broTaskId = taskList1.get(0).getBroTaskId();
@@ -775,7 +810,7 @@ public class FragmentCheck extends Fragment {
 		String taskIdNew = "";
 		String currentSecond = getTime(timeString);
 		long taskIdL = Long.parseLong(task.getTaskid());
-		long PathIdL = Long.parseLong(task.getPathId());
+//		long PathIdL = Long.parseLong(task.getPathId());
 		if (task.getTaskid().length() > currentSecond.length()) {
 			int size = task.getTaskid().length() - currentSecond.length();
 			timeL = (long) (Long.parseLong(currentSecond) * Math.pow(10,size));
@@ -830,6 +865,8 @@ public class FragmentCheck extends Fragment {
 		taskNew.setIsBrother(1);
 		taskNew.setBroTaskId(task.getTaskid());
 		taskNew.setPCLBId(task.getPCLBId());
+		taskNew.setFieldType(task.getFieldType());
+		taskNew.setDeviceCode(task.getDeviceCode());
 		taskNew.save();
 		if (!taskIdNew.equals("")) {
 			copyCondition(task, taskIdNew, timeL);

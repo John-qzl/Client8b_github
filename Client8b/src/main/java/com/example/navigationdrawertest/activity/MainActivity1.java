@@ -46,6 +46,7 @@ import com.example.navigationdrawertest.fragment.HomeFragment;
 import com.example.navigationdrawertest.internet.HttpClientHelper;
 import com.example.navigationdrawertest.internet.SyncWorkThread;
 import com.example.navigationdrawertest.login.Login;
+import com.example.navigationdrawertest.model.BCRelation;
 import com.example.navigationdrawertest.model.Cell;
 import com.example.navigationdrawertest.model.Diagram;
 import com.example.navigationdrawertest.model.Mmc;
@@ -104,6 +105,7 @@ public class MainActivity1 extends FragmentActivity implements OnItemClickListen
     private ListView mDrawerList;
     private NavDrawerListAdapter mAdapter;
     private List<RwRelation> projectList;
+    private List<BCRelation> BCprojectList;
     private List<NavDrawerItem> mNavDrawerItems;
     private TypedArray mNavMenuIconsTypeArray;
     private static int localPosition = 0;
@@ -112,8 +114,15 @@ public class MainActivity1 extends FragmentActivity implements OnItemClickListen
     private String nowProductId;
     private String fieldType = "";  //1产品验收  2武器所检  3靶场试验
 
-    public static void actionStart1(Context context) {
+    public static void actionStart1(Context context, String fieldType) {
         Intent intent = new Intent(context, MainActivity1.class);
+        if (fieldType.equals("1")) {
+            intent.putExtra("fieldType", "1");
+        } else if (fieldType.equals("2")) {
+            intent.putExtra("fieldType", "2");
+        } else {
+            intent.putExtra("fieldType", "3");
+        }
         context.startActivity(intent);
     }
 
@@ -359,9 +368,11 @@ public class MainActivity1 extends FragmentActivity implements OnItemClickListen
         mNavDrawerItems = new ArrayList<NavDrawerItem>();
         //左侧项目树展现方法2，根据RwRelation表格展现----数据表采用
         List<RwRelation> proList = DataSupport.where("userid = ?", OrientApplication.getApplication().loginUser.getUserid()).find(RwRelation.class);
+        List<BCRelation> BCList = DataSupport.where("syfzrID = ?", OrientApplication.getApplication().loginUser.getUserid()).find(BCRelation.class);
         //20200610 暂时放开PAD上人员查看数据权限
 //        List<RwRelation> proList = DataSupport.findAll(RwRelation.class);
         projectList = proList;
+        BCprojectList = BCList;
         for(int i=0; i<proList.size(); i++){
             mNavDrawerItems.add(new NavDrawerItem(proList.get(i).getRwname(), mNavMenuIconsTypeArray
                     .getResourceId(0, -1)));
@@ -388,23 +399,36 @@ public class MainActivity1 extends FragmentActivity implements OnItemClickListen
         // update the main content by replacing fragments
         Fragment fragment = null;
         OrientApplication.getApplication().setCommander(false);
-        if(projectList.size() > 0 && projectList != null){
-            RwRelation proEntity = projectList.get(position);
-            nowProductId = proEntity.getRwid();
-            if(proEntity != null){
-                OrientApplication.getApplication().rw = proEntity;
-                Log.i("项目名称", proEntity.getRwname());
+        if((projectList.size() > 0 && projectList != null) || (BCprojectList.size() > 0 && BCprojectList != null)){
+            RwRelation proEntity = new RwRelation();
+            BCRelation BCproEntity = new BCRelation();
+            if (fieldType.equals("1")) {
+                proEntity = projectList.get(position);
+                nowProductId = proEntity.getRwid();
+            } else {
+                BCproEntity = BCprojectList.get(position);
+                nowProductId = BCproEntity.getSsxh();
+            }
+            if (fieldType.equals("1")) {
+                if (proEntity != null) {
+                    OrientApplication.getApplication().rw = proEntity;
+                    Log.i("项目名称", proEntity.getRwname());
+                }
+            } else {
+                if (BCproEntity != null) {
+                    RwRelation rwRelation = new RwRelation();
+                    rwRelation.setRwid(BCproEntity.getSsxh());
+                    rwRelation.setRwname(BCproEntity.getXhdh());
+                    rwRelation.setFieldType(fieldType);
+                    OrientApplication.getApplication().rw = rwRelation;
+                    Log.i("项目名称", rwRelation.getRwname());
+                }
             }
             localPosition = position;
-            //判断用户是否为节点负责人
-//            String nodeIds = proEntity.getNodeId();
-//            if (nodeIds != null) {
-//                isCommander(nodeIds);
-//            }
             if (fieldType == null) {
                 fieldType = "1";
             }
-            fragment = new HomeFragment(proEntity, fieldType);
+            fragment = new HomeFragment(proEntity, fieldType, BCproEntity);
         }
 
         if (fragment != null) {
@@ -478,7 +502,7 @@ public class MainActivity1 extends FragmentActivity implements OnItemClickListen
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
-                                MainActivity1.actionStart1(MainActivity1.this);
+                                MainActivity1.actionStart1(MainActivity1.this, fieldType);
                                 dialog.cancel();
                             }
                         }).setCancelable(false).show();

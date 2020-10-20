@@ -10,6 +10,7 @@ import com.example.navigationdrawertest.activity.MainActivity1;
 import com.example.navigationdrawertest.activity.SignActivity1;
 import com.example.navigationdrawertest.adapter.Event.LocationEvent;
 import com.example.navigationdrawertest.application.OrientApplication;
+import com.example.navigationdrawertest.model.BCRelation;
 import com.example.navigationdrawertest.model.Cell;
 import com.example.navigationdrawertest.model.Operation;
 import com.example.navigationdrawertest.model.Post;
@@ -70,12 +71,14 @@ public class FragmentSign extends Fragment {
 	private long clicktaskid;
 	private NodeButtonEnum buttontype;
 	private RwRelation proEntity;				//传递过来的项目树节点
+	private BCRelation BCproEntity;
 	private static User user;
 	private String fieldType = "";  //1产品验收  2武器所检  3靶场试验
 
-	public FragmentSign(RwRelation proEntity, String fieldType){
+	public FragmentSign(RwRelation proEntity, String fieldType, BCRelation BCproEntity){
 		this.proEntity = proEntity;
 		this.fieldType = fieldType;
+		this.BCproEntity = BCproEntity;
 	}
 	
 	@Override
@@ -117,7 +120,13 @@ public class FragmentSign extends Fragment {
 		nodeList.clear();
 
 		String testteamStr = user.getTtidandname();
-		List<Task> taskList_rw = DataSupport.where("location = ? and xhId =?", "2",proEntity.getRwid()).find(Task.class);
+		String xhId = "";
+		if (fieldType.equals("1")) {
+			xhId = proEntity.getRwid();
+		} else {
+			xhId = BCproEntity.getSsxh();
+		}
+		List<Task> taskList_rw = DataSupport.where("location = ? and xhId =?  and fieldType=?", "2", xhId, fieldType).find(Task.class);
 		if(taskList_rw.size() != 0){
 			rwList.clear();
 			for (int i = 0; i < taskList_rw.size(); i++) {
@@ -138,90 +147,124 @@ public class FragmentSign extends Fragment {
 					rwList.add(rw);
 				}
 			}
-			rootNode = new DepartmentNode(Long.valueOf(proEntity.getRwid()), proEntity.getRwname(), "0", null, 0);
-			//3,获取所有的岗位实例-path
-			//产品类型节点
-			for(int i=0; i<rwList.size(); i++){
+			String rwName = "";
+			String rwId = "";
+			if (fieldType.equals("1")) {
+				rwId = proEntity.getRwid();
+				rwName = proEntity.getRwname();
+			} else {
+				rwId = BCproEntity.getSsxh();
+				rwName = BCproEntity.getXhdh();
+			}
+			rootNode = new DepartmentNode(Long.valueOf(rwId), rwName, "0", null, 0);
+			//产品验收领域树结构
+			if (fieldType.equals("1")) {
+
+				//3,获取所有的岗位实例-path
+				//产品类型节点
+				for(int i=0; i<rwList.size(); i++){
 //				rootNode = new DepartmentNode(Long.valueOf(rwList.get(i).getRwid()), rwList.get(i).getRwname(), "0", null, 0);
-				TreeNode node0 = new DepartmentNode(Long.valueOf(rwList.get(i).getRwid()), rwList.get(i).getRwname(), "0", rootNode, 1);
+					TreeNode node0 = new DepartmentNode(Long.valueOf(rwList.get(i).getRwid()), rwList.get(i).getRwname(), "0", rootNode, 1);
 //				rootNode.add(node0);
 
-				List<Rw> rwList_pc = new ArrayList<Rw>();				//批次
-				List<Task> taskList_cplx = DataSupport.where("location = ? and rwid =?", "2",rwList.get(i).getRwid()).find(Task.class);
-				rwList_pc.clear();
-				for (int l = 0; l < taskList_cplx.size(); l++) {
-					String pc = taskList_cplx.get(l).getPath();
-					String pcId = taskList_cplx.get(l).getPathId();
-					Rw rw = new Rw();
-					rw.setRwid(pcId);
-					rw.setRwname(pc);
-					if (rwList_pc.size() > 0) {
-						String str = "";
-						for (int j = 0; j < rwList_pc.size(); j++) {
-							str = str + rwList_pc.get(j).getRwid();
-						}
-						if (!str.contains(pcId)) {
+					List<Rw> rwList_pc = new ArrayList<Rw>();				//批次
+					List<Task> taskList_cplx = DataSupport.where("location = ? and rwid =?", "2",rwList.get(i).getRwid()).find(Task.class);
+					rwList_pc.clear();
+					for (int l = 0; l < taskList_cplx.size(); l++) {
+						String pc = taskList_cplx.get(l).getPath();
+						String pcId = taskList_cplx.get(l).getPathId();
+						Rw rw = new Rw();
+						rw.setRwid(pcId);
+						rw.setRwname(pc);
+						if (rwList_pc.size() > 0) {
+							String str = "";
+							for (int j = 0; j < rwList_pc.size(); j++) {
+								str = str + rwList_pc.get(j).getRwid();
+							}
+							if (!str.contains(pcId)) {
+								rwList_pc.add(rw);
+							}
+						} else {
 							rwList_pc.add(rw);
 						}
-					} else {
-						rwList_pc.add(rw);
 					}
-				}
-				//批次节点
-				for (int j = 0; j < rwList_pc.size(); j++) {
-					TreeNode node1 = new DepartmentNode(Long.valueOf(rwList_pc.get(j).getRwid()), rwList_pc.get(j).getRwname(),  "0", rootNode, 2);
+					//批次节点
+					for (int j = 0; j < rwList_pc.size(); j++) {
+						TreeNode node1 = new DepartmentNode(Long.valueOf(rwList_pc.get(j).getRwid()), rwList_pc.get(j).getRwname(),  "0", rootNode, 2);
 //					rootNode.add(node1);
 
-					List<Rw> rwList_ch = new ArrayList<Rw>();				//策划
-					List<Task> taskList_cppc = DataSupport.where("location = ? and pathId =?", "2",rwList_pc.get(j).getRwid()).find(Task.class);
-					rwList_ch.clear();
-					for (int l = 0; l < taskList_cppc.size(); l++) {
-						String ch = taskList_cppc.get(l).getChbh();
-						String chId = taskList_cppc.get(l).getChId();
-						//判读当前人是否有查看此策划的权限
-						List<RwRelation> proList = DataSupport.where("userid = ?", OrientApplication.getApplication().loginUser.getUserid()).find(RwRelation.class);
-						List<String> CHIDs = new ArrayList<>();
-						for (RwRelation rw : proList) {
-							if (!CHIDs.contains(rw.getProductid())) {
-								CHIDs.add(rw.getProductid());
-							}
-						}
-						if (CHIDs.contains(chId)){
-							Rw rw = new Rw();
-							rw.setRwid(chId);
-							rw.setRwname(ch);
-							if (rwList_ch.size() > 0) {
-								String str = "";
-								for (int i1 = 0; i1 < rwList_ch.size(); i1++) {
-									str = str + rwList_ch.get(i1).getRwid();
+						List<Rw> rwList_ch = new ArrayList<Rw>();				//策划
+						List<Task> taskList_cppc = DataSupport.where("location = ? and pathId =?", "2",rwList_pc.get(j).getRwid()).find(Task.class);
+						rwList_ch.clear();
+						for (int l = 0; l < taskList_cppc.size(); l++) {
+							String ch = taskList_cppc.get(l).getChbh();
+							String chId = taskList_cppc.get(l).getChId();
+							//判读当前人是否有查看此策划的权限
+							List<RwRelation> proList = DataSupport.where("userid = ?", OrientApplication.getApplication().loginUser.getUserid()).find(RwRelation.class);
+							List<String> CHIDs = new ArrayList<>();
+							for (RwRelation rw : proList) {
+								if (!CHIDs.contains(rw.getProductid())) {
+									CHIDs.add(rw.getProductid());
 								}
-								if (!str.contains(chId)) {
+							}
+							if (CHIDs.contains(chId)){
+								Rw rw = new Rw();
+								rw.setRwid(chId);
+								rw.setRwname(ch);
+								if (rwList_ch.size() > 0) {
+									String str = "";
+									for (int i1 = 0; i1 < rwList_ch.size(); i1++) {
+										str = str + rwList_ch.get(i1).getRwid();
+									}
+									if (!str.contains(chId)) {
+										rwList_ch.add(rw);
+									}
+								} else {
 									rwList_ch.add(rw);
 								}
-							} else {
-								rwList_ch.add(rw);
 							}
 						}
-					}
-					//4,获取所有表格ID---表格名称
-					for(int k=0; k<rwList_ch.size(); k++){
-						TreeNode node = new DepartmentNode(Long.valueOf(rwList_ch.get(k).getRwid()), rwList_ch.get(k).getRwname(),  "0", node1, 3);
+						//4,获取所有表格ID---表格名称
+						for(int k=0; k<rwList_ch.size(); k++){
+							TreeNode node = new DepartmentNode(Long.valueOf(rwList_ch.get(k).getRwid()), rwList_ch.get(k).getRwname(),  "0", node1, 3);
 //						rootNode.add(node);
 
-						List<Task> tasknodeList = new ArrayList<Task>();
-						for(Task task : taskList_cppc){
-							if(task.getChId().equals(rwList_ch.get(k).getRwid())){
-								tasknodeList.add(task);
+							List<Task> tasknodeList = new ArrayList<Task>();
+							for(Task task : taskList_cppc){
+								if(task.getChId().equals(rwList_ch.get(k).getRwid())){
+									tasknodeList.add(task);
+								}
 							}
+							for(int loop=0; loop<tasknodeList.size(); loop++){
+								node.add(new UserNode(Long.valueOf(tasknodeList.get(loop).getTaskid()), tasknodeList.get(loop).getTaskname(), node, 4));
+							}
+							node1.add(node);
 						}
-						for(int loop=0; loop<tasknodeList.size(); loop++){
-							node.add(new UserNode(Long.valueOf(tasknodeList.get(loop).getTaskid()), tasknodeList.get(loop).getTaskname(), node, 4));
-						}
-						node1.add(node);
+						node0.add(node1);
 					}
-					node0.add(node1);
+					rootNode.add(node0);
 				}
-				rootNode.add(node0);
+			}
+			//其他领域树结构
+			else {
+				List<BCRelation> bcRelationList = new ArrayList<>();
+				if (fieldType.equals("3")) {
+					bcRelationList = DataSupport.where("ssxh = ? and fieldType = ?", BCproEntity.getSsxh(), "3").find(BCRelation.class);
+				} else if (fieldType.equals("2")) {
+					bcRelationList = DataSupport.where("ssxh = ? and fieldType = ?", BCproEntity.getSsxh(), "2").find(BCRelation.class);
+				}
+				if (bcRelationList.size() > 0) {
+					for (int k = 0; k < bcRelationList.size(); k++) {
+						List<Task> BCtaskList = DataSupport.where("location = ? and chId =?", "2", bcRelationList.get(k).getChid()).find(Task.class);;
+						if (BCtaskList.size() > 0) {
+							TreeNode node = new DepartmentNode(Long.valueOf(bcRelationList.get(k).getChid()), bcRelationList.get(k).getChname(), "0", rootNode, 1);
+							for (int loop = 0; loop < BCtaskList.size(); loop++) {
+								node.add(new UserNode(Long.valueOf(BCtaskList.get(loop).getTaskid()), BCtaskList.get(loop).getTaskname(), node, 2));
+							}
+							rootNode.add(node);
+						}
+					}
+				}
 			}
 			rootNode.expandAllNode();
 			rootNode.filterVisibleNode(nodeList);
@@ -347,116 +390,156 @@ public class FragmentSign extends Fragment {
 			if (convertView == null) {
 				LayoutInflater inflater = LayoutInflater.from(context);
 				holder = new ViewHolder();
-				if(layer == 4){
-					convertView = inflater.inflate(R.layout.tree_item_sign, null);
-					holder.tv_name = (TextView) convertView.findViewById(R.id.fragmentsign_txt_tree_name);
-					holder.tv_width = (TextView) convertView.findViewById(R.id.fragmentsign_txt_tree_width);
-					holder.iv_left = (ImageView) convertView.findViewById(R.id.fragmentsign_img_tree_left);
-					holder.sign_button = (Button) convertView.findViewById(R.id.fragmentsign_sign_button);
-					holder.sign_button.setOnClickListener(new OnClickListener(){
-						@Override
-						public void onClick(View v) {
-							clicktaskid = nodeList.get(position).getId();
-							showSweetAlertDialog(clicktaskid, NodeButtonEnum.SIGNBUTTON);
-//							CheckActivity.actionStart(getActivity(), clicktaskid);
-						}
-					});
-//					holder.sign_delete = (Button) convertView.findViewById(R.id.fragmentsign_sign_deletebutton);
-					holder.sign_delete.setOnClickListener(new OnClickListener() {
-						@Override
-						public void onClick(View v) {
-							Dialog alertDialog = new AlertDialog.Builder(context).
-									setTitle("确定删除？").
-									setMessage("您确定删除该条表单吗？").
-									setIcon(R.drawable.logo_title).
-									setPositiveButton("确定", new DialogInterface.OnClickListener() {
-										@Override
-										public void onClick(DialogInterface dialog, int which) {
-											String deleteint = nodeList.get(position).getId()+"";
-											DataSupport.deleteAll(Task.class, "taskid = ?", deleteint);
-											DataSupport.deleteAll(Signature.class, "taskid = ?", deleteint);
-											DataSupport.deleteAll(Cell.class, "taskid = ?", deleteint);
-											DataSupport.deleteAll(Operation.class, "taskid = ?", deleteint);
-											DataSupport.deleteAll(Scene.class, "taskid = ?", deleteint);
-											DataSupport.deleteAll(Rw.class, "tableinstanceid = ?", deleteint);
-											EventBus.getDefault().post(new LocationEvent("ok"));
-										}
-									}).
-									setNegativeButton("取消", new DialogInterface.OnClickListener() {
-										@Override
-										public void onClick(DialogInterface dialog, int which) {
-											dialog.dismiss();
-										}
-									}).
-									create();
-							alertDialog.show();
-						}
-					});
-					holder.sign_back = (Button) convertView.findViewById(R.id.fragmentsign_back_button);
-//					if (task.size() > 0) {
-//						if (task.get(0).getNodeLeaderId().contains(OrientApplication.getApplication().loginUser.getUserid())) {
-//							holder.sign_back.setVisibility(View.VISIBLE);
-//						}
-//						holder.sign_back.setOnClickListener(new OnClickListener() {
-//							@Override
-//							public void onClick(View v) {
-//								warnInfo(task.get(0));
-//							}
-//						});
-//					}
-				}else if (layer == 0) {
-					convertView = inflater.inflate(R.layout.tree_item_init_null, null);
-					holder.tv_name = (TextView) convertView.findViewById(R.id.init_txt_tree_name);
-					holder.tv_width = (TextView) convertView.findViewById(R.id.init_txt_tree_width);
-					holder.iv_left = (ImageView) convertView.findViewById(R.id.init_img_tree_left);
-				}else{
-					convertView = inflater.inflate(R.layout.tree_item_init, null);
-					holder.tv_name = (TextView) convertView.findViewById(R.id.init_txt_tree_name);
-					holder.tv_width = (TextView) convertView.findViewById(R.id.init_txt_tree_width);
-					holder.iv_left = (ImageView) convertView.findViewById(R.id.init_img_tree_left);
+				if (fieldType.equals("1")) {
+					//产品验收树结构
+					if (layer == 4) {
+						convertView = inflater.inflate(R.layout.tree_item_sign, null);
+						holder.tv_name = (TextView) convertView.findViewById(R.id.fragmentsign_txt_tree_name);
+						holder.tv_width = (TextView) convertView.findViewById(R.id.fragmentsign_txt_tree_width);
+						holder.iv_left = (ImageView) convertView.findViewById(R.id.fragmentsign_img_tree_left);
+						holder.sign_button = (Button) convertView.findViewById(R.id.fragmentsign_sign_button);
+						holder.sign_button.setOnClickListener(new OnClickListener() {
+							@Override
+							public void onClick(View v) {
+								clicktaskid = nodeList.get(position).getId();
+								showSweetAlertDialog(clicktaskid, NodeButtonEnum.SIGNBUTTON);
+							}
+						});
+						holder.sign_delete.setOnClickListener(new OnClickListener() {
+							@Override
+							public void onClick(View v) {
+								Dialog alertDialog = new AlertDialog.Builder(context).
+										setTitle("确定删除？").
+										setMessage("您确定删除该条表单吗？").
+										setIcon(R.drawable.logo_title).
+										setPositiveButton("确定", new DialogInterface.OnClickListener() {
+											@Override
+											public void onClick(DialogInterface dialog, int which) {
+												String deleteint = nodeList.get(position).getId() + "";
+												DataSupport.deleteAll(Task.class, "taskid = ?", deleteint);
+												DataSupport.deleteAll(Signature.class, "taskid = ?", deleteint);
+												DataSupport.deleteAll(Cell.class, "taskid = ?", deleteint);
+												DataSupport.deleteAll(Operation.class, "taskid = ?", deleteint);
+												DataSupport.deleteAll(Scene.class, "taskid = ?", deleteint);
+												DataSupport.deleteAll(Rw.class, "tableinstanceid = ?", deleteint);
+												EventBus.getDefault().post(new LocationEvent("ok"));
+											}
+										}).
+										setNegativeButton("取消", new DialogInterface.OnClickListener() {
+											@Override
+											public void onClick(DialogInterface dialog, int which) {
+												dialog.dismiss();
+											}
+										}).
+										create();
+								alertDialog.show();
+							}
+						});
+						holder.sign_back = (Button) convertView.findViewById(R.id.fragmentsign_back_button);
+					} else if (layer == 0) {
+						convertView = inflater.inflate(R.layout.tree_item_init_null, null);
+						holder.tv_name = (TextView) convertView.findViewById(R.id.init_txt_tree_name);
+						holder.tv_width = (TextView) convertView.findViewById(R.id.init_txt_tree_width);
+						holder.iv_left = (ImageView) convertView.findViewById(R.id.init_img_tree_left);
+					} else {
+						convertView = inflater.inflate(R.layout.tree_item_init, null);
+						holder.tv_name = (TextView) convertView.findViewById(R.id.init_txt_tree_name);
+						holder.tv_width = (TextView) convertView.findViewById(R.id.init_txt_tree_width);
+						holder.iv_left = (ImageView) convertView.findViewById(R.id.init_img_tree_left);
+					}
+				} else {
+					//武器所检树结构
+					if(layer == 2){
+						convertView = inflater.inflate(R.layout.tree_item_sign, null);
+						holder.tv_name = (TextView) convertView.findViewById(R.id.fragmentsign_txt_tree_name);
+						holder.tv_width = (TextView) convertView.findViewById(R.id.fragmentsign_txt_tree_width);
+						holder.iv_left = (ImageView) convertView.findViewById(R.id.fragmentsign_img_tree_left);
+						holder.sign_button = (Button) convertView.findViewById(R.id.fragmentsign_sign_button);
+						holder.sign_button.setOnClickListener(new OnClickListener(){
+							@Override
+							public void onClick(View v) {
+								// TODO Auto-generated method stub
+								clicktaskid = nodeList.get(position).getId();
+								showSweetAlertDialog(clicktaskid, NodeButtonEnum.SIGNBUTTON);
+							}
+						});
+						holder.sign_back = (Button) convertView.findViewById(R.id.fragmentsign_back_button);
+					} else if (layer == 0) {
+						convertView = inflater.inflate(R.layout.tree_item_init_null, null);
+						holder.tv_name = (TextView) convertView.findViewById(R.id.init_txt_tree_name);
+						holder.tv_width = (TextView) convertView.findViewById(R.id.init_txt_tree_width);
+						holder.iv_left = (ImageView) convertView.findViewById(R.id.init_img_tree_left);
+					}else {
+						convertView = inflater.inflate(R.layout.tree_item_init, null);
+						holder.tv_name = (TextView) convertView.findViewById(R.id.init_txt_tree_name);
+						holder.tv_width = (TextView) convertView.findViewById(R.id.init_txt_tree_width);
+						holder.iv_left = (ImageView) convertView.findViewById(R.id.init_img_tree_left);
+
+					}
+
 				}
 				convertView.setTag(holder);
 			} else {
 				LayoutInflater inflater = LayoutInflater.from(context);
 				holder = new ViewHolder();
-				if(layer == 4){
-					convertView = inflater.inflate(R.layout.tree_item_sign, null);
-					holder.tv_name = (TextView) convertView.findViewById(R.id.fragmentsign_txt_tree_name);
-					holder.tv_width = (TextView) convertView.findViewById(R.id.fragmentsign_txt_tree_width);
-					holder.iv_left = (ImageView) convertView.findViewById(R.id.fragmentsign_img_tree_left);
-					holder.sign_button = (Button) convertView.findViewById(R.id.fragmentsign_sign_button);
-					holder.sign_button.setOnClickListener(new OnClickListener(){
-						@Override
-						public void onClick(View v) {
-							// TODO Auto-generated method stub
-							clicktaskid = nodeList.get(position).getId();
-							showSweetAlertDialog(clicktaskid, NodeButtonEnum.SIGNBUTTON);
-						}
-					});
-					holder.sign_back = (Button) convertView.findViewById(R.id.fragmentsign_back_button);
-//					if (task.size() > 0) {
-//						if (task.get(0).getNodeLeaderId().contains(OrientApplication.getApplication().loginUser.getUserid())) {
-//							holder.sign_back.setVisibility(View.VISIBLE);
-//						}
-//						holder.sign_back.setOnClickListener(new OnClickListener() {
-//							@Override
-//							public void onClick(View v) {
-//								warnInfo(task.get(0));
-//							}
-//						});
-//					}
+				if (fieldType.equals("1")) {
+					//产品验收树结构
+					if(layer == 4){
+						convertView = inflater.inflate(R.layout.tree_item_sign, null);
+						holder.tv_name = (TextView) convertView.findViewById(R.id.fragmentsign_txt_tree_name);
+						holder.tv_width = (TextView) convertView.findViewById(R.id.fragmentsign_txt_tree_width);
+						holder.iv_left = (ImageView) convertView.findViewById(R.id.fragmentsign_img_tree_left);
+						holder.sign_button = (Button) convertView.findViewById(R.id.fragmentsign_sign_button);
+						holder.sign_button.setOnClickListener(new OnClickListener(){
+							@Override
+							public void onClick(View v) {
+								// TODO Auto-generated method stub
+								clicktaskid = nodeList.get(position).getId();
+								showSweetAlertDialog(clicktaskid, NodeButtonEnum.SIGNBUTTON);
+							}
+						});
+						holder.sign_back = (Button) convertView.findViewById(R.id.fragmentsign_back_button);
+					} else if (layer == 0) {
+						convertView = inflater.inflate(R.layout.tree_item_init_null, null);
+						holder.tv_name = (TextView) convertView.findViewById(R.id.init_txt_tree_name);
+						holder.tv_width = (TextView) convertView.findViewById(R.id.init_txt_tree_width);
+						holder.iv_left = (ImageView) convertView.findViewById(R.id.init_img_tree_left);
+					}else {
+						convertView = inflater.inflate(R.layout.tree_item_init, null);
+						holder.tv_name = (TextView) convertView.findViewById(R.id.init_txt_tree_name);
+						holder.tv_width = (TextView) convertView.findViewById(R.id.init_txt_tree_width);
+						holder.iv_left = (ImageView) convertView.findViewById(R.id.init_img_tree_left);
 
-				} else if (layer == 0) {
-					convertView = inflater.inflate(R.layout.tree_item_init_null, null);
-					holder.tv_name = (TextView) convertView.findViewById(R.id.init_txt_tree_name);
-					holder.tv_width = (TextView) convertView.findViewById(R.id.init_txt_tree_width);
-					holder.iv_left = (ImageView) convertView.findViewById(R.id.init_img_tree_left);
-				}else {
-					convertView = inflater.inflate(R.layout.tree_item_init, null);
-					holder.tv_name = (TextView) convertView.findViewById(R.id.init_txt_tree_name);
-					holder.tv_width = (TextView) convertView.findViewById(R.id.init_txt_tree_width);
-					holder.iv_left = (ImageView) convertView.findViewById(R.id.init_img_tree_left);
+					}
+				} else {
+					//武器所检树结构
+					if(layer == 2){
+						convertView = inflater.inflate(R.layout.tree_item_sign, null);
+						holder.tv_name = (TextView) convertView.findViewById(R.id.fragmentsign_txt_tree_name);
+						holder.tv_width = (TextView) convertView.findViewById(R.id.fragmentsign_txt_tree_width);
+						holder.iv_left = (ImageView) convertView.findViewById(R.id.fragmentsign_img_tree_left);
+						holder.sign_button = (Button) convertView.findViewById(R.id.fragmentsign_sign_button);
+						holder.sign_button.setOnClickListener(new OnClickListener(){
+							@Override
+							public void onClick(View v) {
+								// TODO Auto-generated method stub
+								clicktaskid = nodeList.get(position).getId();
+								showSweetAlertDialog(clicktaskid, NodeButtonEnum.SIGNBUTTON);
+							}
+						});
+						holder.sign_back = (Button) convertView.findViewById(R.id.fragmentsign_back_button);
+					} else if (layer == 0) {
+						convertView = inflater.inflate(R.layout.tree_item_init_null, null);
+						holder.tv_name = (TextView) convertView.findViewById(R.id.init_txt_tree_name);
+						holder.tv_width = (TextView) convertView.findViewById(R.id.init_txt_tree_width);
+						holder.iv_left = (ImageView) convertView.findViewById(R.id.init_img_tree_left);
+					}else {
+						convertView = inflater.inflate(R.layout.tree_item_init, null);
+						holder.tv_name = (TextView) convertView.findViewById(R.id.init_txt_tree_name);
+						holder.tv_width = (TextView) convertView.findViewById(R.id.init_txt_tree_width);
+						holder.iv_left = (ImageView) convertView.findViewById(R.id.init_img_tree_left);
 
+					}
 				}
 				convertView.setTag(holder);
 			}
@@ -468,8 +551,6 @@ public class FragmentSign extends Fragment {
 			if (nodeList.get(position).getExpandStatus() == 2 && broTaskId != null) {
 				holder.iv_left.setImageResource(leftIds[3]);
 			}
-//			int[] leftIds = { R.drawable.icon_plusminus_add_black, R.drawable.icon_plusminus_reduce_black, R.drawable.icon_head_default };
-//			holder.iv_left.setImageResource(leftIds[nodeList.get(position).getExpandStatus()]);
 			int[] rightIds = { R.drawable.icon_checkbox_none, R.drawable.icon_checkbox_all, R.drawable.icon_checkbox_part };
 			holder.tv_width.setMinWidth(layer * (holder.iv_left.getLayoutParams().width));
 

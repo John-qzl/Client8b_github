@@ -243,7 +243,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 				Log.i("项目名称", proEntity.getRwname());
 			}
 			localPosition = position;
-			fragment = new HomeFragment(proEntity, fieldType);
+//			fragment = new HomeFragment(proEntity, fieldType);
 		}
 
 		if (fragment != null) {

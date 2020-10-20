@@ -86,11 +86,15 @@ public class GateActivity extends BaseActivity {
         mLineCPYS.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                List<RwRelation> proList = DataSupport.where("userid = ?", OrientApplication.getApplication().loginUser.getUserid()).find(RwRelation.class);
-                if (proList.size() > 0) {
-                    Intent intent = new Intent(GateActivity.this, MainActivity1.class);
-                    intent.putExtra("fieldType", "1");
-                    startActivity(intent);
+                if (OrientApplication.getApplication().loginUser.getUserid() != null) {
+                    List<RwRelation> proList = DataSupport.where("userid = ?", OrientApplication.getApplication().loginUser.getUserid()).find(RwRelation.class);
+                    if (proList.size() > 0) {
+                        Intent intent = new Intent(GateActivity.this, MainActivity1.class);
+                        intent.putExtra("fieldType", "1");
+                        startActivity(intent);
+                    } else {
+                        showDialog("此领域暂无数据");
+                    }
                 } else {
                     showDialog("此领域暂无数据");
                 }
@@ -99,29 +103,37 @@ public class GateActivity extends BaseActivity {
         mLineWQSJ.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                List<RwRelation> BCList = DataSupport.where("userid = ?", OrientApplication.getApplication().loginUser.getUserid()).find(RwRelation.class);
-//                if (BCList.size() > 0) {
-//                    Intent intent = new Intent(GateActivity.this, MainActivity1.class);
-//                    intent.putExtra("fieldType", "2");
-//                    startActivity(intent);
-//                } else {
-//                    showDialog("此领域暂无数据");
-//                }
-                showDialog("此领域暂未启用");
+                if (OrientApplication.getApplication().loginUser.getUserid() != null) {
+                    List<BCRelation> BCList = DataSupport.where("syfzrID = ?", OrientApplication.getApplication().loginUser.getUserid()).find(BCRelation.class);
+                    if (BCList.size() > 0) {
+                        Intent intent = new Intent(GateActivity.this, MainActivity1.class);
+                        intent.putExtra("fieldType", "2");
+                        startActivity(intent);
+                    } else {
+                        showDialog("此领域暂无数据");
+                    }
+                } else {
+                    showDialog("此领域暂无数据");
+                }
+//                showDialog("此领域暂未启用");
             }
         });
         mLineBCSY.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                List<BCRelation> BCList = DataSupport.where("syfzrID = ?", OrientApplication.getApplication().loginUser.getUserid()).find(BCRelation.class);
-//                if (BCList.size() > 0) {
-//                    Intent intent = new Intent(GateActivity.this, MainActivity1.class);
-//                    intent.putExtra("fieldType", "3");
-//                    startActivity(intent);
-//                } else {
-//                    showDialog("此领域暂无数据");
-//                }
-                showDialog("此领域暂未启用");
+                if (OrientApplication.getApplication().loginUser.getUserid() != null) {
+                    List<BCRelation> BCList = DataSupport.where("syfzrID = ?", OrientApplication.getApplication().loginUser.getUserid()).find(BCRelation.class);
+                    if (BCList.size() > 0) {
+                        Intent intent = new Intent(GateActivity.this, MainActivity1.class);
+                        intent.putExtra("fieldType", "3");
+                        startActivity(intent);
+                    } else {
+                        showDialog("此领域暂无数据");
+                    }
+                } else {
+                    showDialog("此领域暂无数据");
+                }
+//                showDialog("此领域暂未启用");
             }
         });
     }

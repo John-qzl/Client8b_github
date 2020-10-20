@@ -13,6 +13,15 @@ public class BCRelation extends DataSupport {
     private String ssxh;			//所属型号ID
     private String xhdh;			//所属型号代号
     private String syfzrID;           //试验负责人
+    private String fieldType;           //区分靶场3还是武器2
+
+    public String getFieldType() {
+        return fieldType;
+    }
+
+    public void setFieldType(String fieldType) {
+        this.fieldType = fieldType;
+    }
 
     public int getId() {
         return id;

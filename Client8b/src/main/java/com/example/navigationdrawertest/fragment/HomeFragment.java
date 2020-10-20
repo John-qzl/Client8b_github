@@ -26,6 +26,7 @@ import android.view.Window;
 
 import com.cssrc.astuetz.PagerSlidingTabStrip;
 import com.example.navigationdrawertest.R;
+import com.example.navigationdrawertest.model.BCRelation;
 import com.example.navigationdrawertest.model.RwRelation;
 
 @SuppressLint("ValidFragment")
@@ -34,7 +35,8 @@ public class HomeFragment extends Fragment {
 	private View view;
 	private LayoutInflater inflater;
 	private RwRelation proEntity;
-	
+	private BCRelation BCproEntity;
+
 	private FragmentCheck fragmentcheck;
 	private FragmentSign fragmentsign;
 	private FragmentUnupload fragmentunupload;
@@ -55,9 +57,10 @@ public class HomeFragment extends Fragment {
 	 */
 	private DisplayMetrics dm;
 
-	public HomeFragment(RwRelation proEntity, String fieldType) {
+	public HomeFragment(RwRelation proEntity, String fieldType, BCRelation BCproEntity) {
 		this.proEntity = proEntity;
 		this.fieldType = fieldType;
+		this.BCproEntity = BCproEntity;
 //		refresh();
 	}
 
@@ -140,27 +143,27 @@ public class HomeFragment extends Fragment {
 			switch (position) {
 			case 0:
 				if (fragmentcheck == null) {
-					fragmentcheck = new FragmentCheck(proEntity, fieldType);
+					fragmentcheck = new FragmentCheck(proEntity, fieldType, BCproEntity);
 				}
 				return fragmentcheck;
 			case 1:
 				if (fragmentsign == null) {
-					fragmentsign = new FragmentSign(proEntity, fieldType);
+					fragmentsign = new FragmentSign(proEntity, fieldType, BCproEntity);
 				}
 				return fragmentsign;
 			case 2:
 				if (fragmentunupload == null) {
-					fragmentunupload = new FragmentUnupload(proEntity, fieldType);
+					fragmentunupload = new FragmentUnupload(proEntity, fieldType, BCproEntity);
 				}
 				return fragmentunupload;
 			case 3:
 				if (fragmentupload == null) {
-					fragmentupload = new FragmentUpload(proEntity, fieldType);
+					fragmentupload = new FragmentUpload(proEntity, fieldType, BCproEntity);
 				}
 				return fragmentupload;
 			case 4:
 				if (fragmentall == null) {
-					fragmentall = new FragmentAll(proEntity, fieldType);
+					fragmentall = new FragmentAll(proEntity, fieldType, BCproEntity);
 				}
 				return fragmentall;
 			default:
