@@ -204,101 +204,9 @@ public class MainActivity1 extends FragmentActivity implements OnItemClickListen
         mMedia.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                List<Product> productList = DataSupport.findAll(Product.class);
-//		List<Mmc> mmcList = DataSupport.findAll(Mmc.class);
-                List<Mmc> mmcList = DataSupport.where("productId = ?", nowProductId).find(Mmc.class);
-                List<Rw> mmcRWList = new ArrayList<>();
-                if (mmcList.size() > 0) {
-                    for (Mmc mmc : mmcList) {
-                        Rw rw0 = new Rw();
-                        rw0.setRwid(mmc.getCategoryId());
-                        rw0.setRwname(mmc.getCategoryName());
-                        if (mmcRWList.size() == 0) {
-                            mmcRWList.add(rw0);
-                        } else {
-                            List<String> list = new ArrayList<String>();
-                            for (Rw rw : mmcRWList) {
-                                list.add(rw.getRwid());
-                            }
-                            if (!list.contains(mmc.getCategoryId())) {
-                                mmcRWList.add(rw0);
-                            }
-                        }
-                    }
-                }
-                //0,根节点
-//		rootNode = new DepartmentNode(Long.valueOf(-1), "多媒体资料", "0", null, 0);
-
-                if(mmcRWList.size() > 0){
-                    //2,类别节点
-                    for(Rw rw : mmcRWList){
-//				TreeNode rwNode = new DepartmentNode(Long.valueOf(rw.getRwid()), rw.getRwname(), "0", productNode, 2);
-                        rootNode = new DepartmentNode(Long.valueOf(rw.getRwid()), rw.getRwname(), "0", null, 0);
-                        List<Mmc> mmcbatchList = DataSupport.where("categoryId = ?", rw.getRwid()).find(Mmc.class);
-                        List<Rw> mmcbatchList1 = new ArrayList<>();
-                        if (mmcbatchList.size() > 0) {
-                            for (Mmc mmc : mmcbatchList) {
-                                Rw rw1 = new Rw();
-                                rw1.setRwid(mmc.getBatchId());
-                                rw1.setRwname(mmc.getBatchName());
-                                if (mmcbatchList1.size() == 0) {
-                                    mmcbatchList1.add(rw1);
-                                } else {
-                                    List<String> list = new ArrayList<String>();
-                                    for (Rw rw11 : mmcbatchList1) {
-                                        list.add(rw11.getRwid());
-                                    }
-                                    if (!list.contains(rw1.getRwid())) {
-                                        mmcbatchList1.add(rw1);
-                                    }
-                                }
-                            }
-                        }
-                        //3,批次节点
-                        for (Rw rw1 : mmcbatchList1) {
-                            TreeNode rwNode3 = new DepartmentNode(Long.valueOf(rw1.getRwid()), rw1.getRwname(), "0", rootNode, 1);
-
-                            List<Mmc> mmcPlanIdList = DataSupport.where("batchId = ?", rw1.getRwid()).find(Mmc.class);
-                            List<Rw> mmcPlanIdList1 = new ArrayList<>();
-                            if (mmcPlanIdList.size() > 0) {
-                                for (Mmc mmc : mmcPlanIdList) {
-                                    Rw rw2 = new Rw();
-                                    rw2.setRwid(mmc.getPlanId());
-                                    rw2.setRwname(mmc.getPlanName());
-                                    if (mmcPlanIdList1.size() == 0) {
-                                        mmcPlanIdList1.add(rw2);
-                                    } else {
-                                        List<String> list = new ArrayList<String>();
-                                        for (Rw rw11 : mmcPlanIdList1) {
-                                            list.add(rw11.getRwid());
-                                        }
-                                        if (!list.contains(rw2.getRwid())) {
-                                            mmcPlanIdList1.add(rw2);
-                                        }
-                                    }
-                                }
-                            }
-                            //4,策划节点
-                            for (Rw rw2 : mmcPlanIdList1) {
-                                TreeNode rwNode4 = new DepartmentNode(Long.valueOf(rw2.getRwid()), rw2.getRwname(), "0", rwNode3, 2);
-
-                                List<Mmc> mmcFileIdList = DataSupport.where("PlanId = ?", rw2.getRwid()).find(Mmc.class);
-                                if (mmcFileIdList.size() > 0) {
-                                    //5，文件节点
-                                    for(Mmc mmc : mmcFileIdList){
-                                        rwNode4.add(new UserNode(Long.valueOf(mmc.getMmc_Id()), mmc.getMmc_Name(), rwNode4, 3));
-                                    }
-                                }
-                                rwNode3.add(rwNode4);
-                            }
-                            rootNode.add(rwNode3);
-                        }
-//				productNode.add(rwNode);
-                    }
-//			rootNode.add(productNode);
-                }
                 Intent intent = new Intent(MainActivity1.this, DocActivity.class);
                 intent.putExtra("nowProductId", nowProductId);
+                intent.putExtra("fieldType", fieldType);
                 startActivity(intent);
             }
         });
@@ -373,9 +281,16 @@ public class MainActivity1 extends FragmentActivity implements OnItemClickListen
 //        List<RwRelation> proList = DataSupport.findAll(RwRelation.class);
         projectList = proList;
         BCprojectList = BCList;
-        for(int i=0; i<proList.size(); i++){
-            mNavDrawerItems.add(new NavDrawerItem(proList.get(i).getRwname(), mNavMenuIconsTypeArray
-                    .getResourceId(0, -1)));
+        if (fieldType.equals("1")) {
+            for(int i=0; i<proList.size(); i++){
+                mNavDrawerItems.add(new NavDrawerItem(proList.get(i).getRwname(), mNavMenuIconsTypeArray
+                        .getResourceId(0, -1)));
+            }
+        } else {
+            for(int i=0; i<BCList.size(); i++){
+                mNavDrawerItems.add(new NavDrawerItem(BCList.get(i).getXhdh(), mNavMenuIconsTypeArray
+                        .getResourceId(0, -1)));
+            }
         }
 
         // Recycle the typed array
@@ -440,7 +355,11 @@ public class MainActivity1 extends FragmentActivity implements OnItemClickListen
             mDrawerList.setItemChecked(position, true);
             mDrawerList.setSelection(position);
 //            setTitle(projectList.get(position).getRwname());
-            mtitle.setText(projectList.get(position).getRwname());
+            if (fieldType.equals("1")) {
+                mtitle.setText(projectList.get(position).getRwname());
+            } else {
+                mtitle.setText(BCprojectList.get(position).getChname());
+            }
             mDrawerLayout.closeDrawer(mDrawerList);
         } else {
             Log.e("MainActivity", "Error in creating fragment");

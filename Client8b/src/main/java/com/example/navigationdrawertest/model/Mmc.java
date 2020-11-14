@@ -21,6 +21,15 @@ public class Mmc extends DataSupport{
 	private String batchName;//批次Name
 	private String PlanId;//策划ID
 	private String PlanName;//策划Name
+	private String fieldType;//策划Name
+
+	public String getFieldType() {
+		return fieldType;
+	}
+
+	public void setFieldType(String fieldType) {
+		this.fieldType = fieldType;
+	}
 
 	public String getProductName() {
 		return productName;

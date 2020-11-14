@@ -323,7 +323,7 @@ public class CheckActivity1 extends BaseActivity implements ObservableScrollView
                             pandu(cell, prefixCodes);
                         }
                     }
-                    if (actualvalVerti.size() > 0) {
+                    if (actualvalVerti.size() > 0 && currentTask.getTempType().equals("2")) {
                         for (int i = 0; i < actualvalVerti.size(); i++) {
 //							int isBuFuhe = 0;
                             List<String> fuHeDuList = new ArrayList<String>();
@@ -334,13 +334,6 @@ public class CheckActivity1 extends BaseActivity implements ObservableScrollView
                                     String fuhedu = actVertiCellList.get(j).getIsFuhe();
                                     fuHeDuList.add(fuhedu);
                                 }
-//								if (!fuhedu.equals("")) {
-//									if (fuhedu.equals(Config.buhege)) {
-//										isBuFuhe = 1; //此列结论不符合
-//									} else if (fuhedu.equals(Config.hege)){
-//										isBuFuhe = 2; //此列结论符合
-//									}
-//								}
                             }
                             Operation operation = DataSupport.where("cellid=? and taskid=?", cellList.get(0).getCellid(), task_id + "").find(Operation.class).get(0);
                             if (fuHeDuList.contains(Config.buhege)) {

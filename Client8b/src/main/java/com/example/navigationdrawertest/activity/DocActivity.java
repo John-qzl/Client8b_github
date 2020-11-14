@@ -10,10 +10,12 @@ import org.litepal.crud.DataSupport;
 
 import com.example.navigationdrawertest.R;
 import com.example.navigationdrawertest.application.OrientApplication;
+import com.example.navigationdrawertest.model.BCRelation;
 import com.example.navigationdrawertest.model.Mmc;
 import com.example.navigationdrawertest.model.Product;
 import com.example.navigationdrawertest.model.Rw;
 import com.example.navigationdrawertest.model.RwRelation;
+import com.example.navigationdrawertest.model.Task;
 import com.example.navigationdrawertest.secret.FileEncryption;
 import com.example.navigationdrawertest.tree.DepartmentNode;
 import com.example.navigationdrawertest.tree.TreeNode;
@@ -55,13 +57,15 @@ public class DocActivity extends BaseActivity{
 	private Context context;
 	private LinearLayout mBack;
 	private String nowProductId;
-	
+	private String fieldType;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.doclist);
 		getActionBar().hide();
 		nowProductId = getIntent().getStringExtra("nowProductId");
+		fieldType = getIntent().getStringExtra("fieldType");
 		context = this;
 		initUI();
 		adapter = new MyBaseAdapter();
@@ -107,134 +111,118 @@ public class DocActivity extends BaseActivity{
 	 */
 	public void initData(){
 		List<Product> productList = DataSupport.findAll(Product.class);
-//		List<Mmc> mmcList = DataSupport.findAll(Mmc.class);
-		List<Mmc> mmcList = DataSupport.where("productId = ?", nowProductId).find(Mmc.class);
-		List<Rw> mmcRWList = new ArrayList<>();
-		if (mmcList.size() > 0) {
-			for (Mmc mmc : mmcList) {
-				Rw rw0 = new Rw();
-				rw0.setRwid(mmc.getCategoryId());
-				rw0.setRwname(mmc.getCategoryName());
-				if (mmcRWList.size() == 0) {
-					mmcRWList.add(rw0);
-				} else {
-					List<String> list = new ArrayList<String>();
-					for (Rw rw : mmcRWList) {
-						list.add(rw.getRwid());
-					}
-					if (!list.contains(mmc.getCategoryId())) {
+		List<Mmc> mmcList = new ArrayList<>();
+		mmcList = DataSupport.where("productId = ? and fieldType=?", nowProductId, fieldType).find(Mmc.class);
+		if (fieldType.equals("1")) {
+			List<Rw> mmcRWList = new ArrayList<>();
+			if (mmcList.size() > 0) {
+				for (Mmc mmc : mmcList) {
+					Rw rw0 = new Rw();
+					rw0.setRwid(mmc.getCategoryId());
+					rw0.setRwname(mmc.getCategoryName());
+					if (mmcRWList.size() == 0) {
 						mmcRWList.add(rw0);
-					}
-				}
-			}
-		}
-		//0,根节点
-//		rootNode = new DepartmentNode(Long.valueOf(-1), "多媒体资料", "0", null, 0);
-
-		if(mmcRWList.size() > 0){
-			//2,类别节点
-			for(Rw rw : mmcRWList){
-//				TreeNode rwNode = new DepartmentNode(Long.valueOf(rw.getRwid()), rw.getRwname(), "0", productNode, 2);
-				rootNode = new DepartmentNode(Long.valueOf(rw.getRwid()), rw.getRwname(), "0", null, 0);
-				List<Mmc> mmcbatchList = DataSupport.where("categoryId = ?", rw.getRwid()).find(Mmc.class);
-				List<Rw> mmcbatchList1 = new ArrayList<>();
-				if (mmcbatchList.size() > 0) {
-					for (Mmc mmc : mmcbatchList) {
-						Rw rw1 = new Rw();
-						rw1.setRwid(mmc.getBatchId());
-						rw1.setRwname(mmc.getBatchName());
-						if (mmcbatchList1.size() == 0) {
-							mmcbatchList1.add(rw1);
-						} else {
-							List<String> list = new ArrayList<String>();
-							for (Rw rw11 : mmcbatchList1) {
-								list.add(rw11.getRwid());
-							}
-							if (!list.contains(rw1.getRwid())) {
-								mmcbatchList1.add(rw1);
-							}
+					} else {
+						List<String> list = new ArrayList<String>();
+						for (Rw rw : mmcRWList) {
+							list.add(rw.getRwid());
+						}
+						if (!list.contains(mmc.getCategoryId())) {
+							mmcRWList.add(rw0);
 						}
 					}
 				}
-				//3,批次节点
-				for (Rw rw1 : mmcbatchList1) {
-					TreeNode rwNode3 = new DepartmentNode(Long.valueOf(rw1.getRwid()), rw1.getRwname(), "0", rootNode, 1);
+			}
 
-					List<Mmc> mmcPlanIdList = DataSupport.where("batchId = ?", rw1.getRwid()).find(Mmc.class);
-					List<Rw> mmcPlanIdList1 = new ArrayList<>();
-					if (mmcPlanIdList.size() > 0) {
-						for (Mmc mmc : mmcPlanIdList) {
-							Rw rw2 = new Rw();
-							rw2.setRwid(mmc.getPlanId());
-							rw2.setRwname(mmc.getPlanName());
-							if (mmcPlanIdList1.size() == 0) {
-								mmcPlanIdList1.add(rw2);
+			if(mmcRWList.size() > 0){
+				for(Rw rw : mmcRWList){
+					rootNode = new DepartmentNode(Long.valueOf(rw.getRwid()), rw.getRwname(), "0", null, 0);
+					List<Mmc> mmcbatchList = DataSupport.where("categoryId = ?", rw.getRwid()).find(Mmc.class);
+					List<Rw> mmcbatchList1 = new ArrayList<>();
+					if (mmcbatchList.size() > 0) {
+						for (Mmc mmc : mmcbatchList) {
+							Rw rw1 = new Rw();
+							rw1.setRwid(mmc.getBatchId());
+							rw1.setRwname(mmc.getBatchName());
+							if (mmcbatchList1.size() == 0) {
+								mmcbatchList1.add(rw1);
 							} else {
 								List<String> list = new ArrayList<String>();
-								for (Rw rw11 : mmcPlanIdList1) {
+								for (Rw rw11 : mmcbatchList1) {
 									list.add(rw11.getRwid());
 								}
-								if (!list.contains(rw2.getRwid())) {
-									mmcPlanIdList1.add(rw2);
+								if (!list.contains(rw1.getRwid())) {
+									mmcbatchList1.add(rw1);
 								}
 							}
 						}
 					}
-					//4,策划节点
-					for (Rw rw2 : mmcPlanIdList1) {
-						TreeNode rwNode4 = new DepartmentNode(Long.valueOf(rw2.getRwid()), rw2.getRwname(), "0", rwNode3, 2);
+					//3,批次节点
+					for (Rw rw1 : mmcbatchList1) {
+						TreeNode rwNode3 = new DepartmentNode(Long.valueOf(rw1.getRwid()), rw1.getRwname(), "0", rootNode, 1);
 
-						List<Mmc> mmcFileIdList = DataSupport.where("PlanId = ?", rw2.getRwid()).find(Mmc.class);
-						if (mmcFileIdList.size() > 0) {
-							//5，文件节点
-							for(Mmc mmc : mmcFileIdList){
-								rwNode4.add(new UserNode(Long.valueOf(mmc.getMmc_Id()), mmc.getMmc_Name(), rwNode4, 3));
+						List<Mmc> mmcPlanIdList = DataSupport.where("batchId = ?", rw1.getRwid()).find(Mmc.class);
+						List<Rw> mmcPlanIdList1 = new ArrayList<>();
+						if (mmcPlanIdList.size() > 0) {
+							for (Mmc mmc : mmcPlanIdList) {
+								Rw rw2 = new Rw();
+								rw2.setRwid(mmc.getPlanId());
+								rw2.setRwname(mmc.getPlanName());
+								if (mmcPlanIdList1.size() == 0) {
+									mmcPlanIdList1.add(rw2);
+								} else {
+									List<String> list = new ArrayList<String>();
+									for (Rw rw11 : mmcPlanIdList1) {
+										list.add(rw11.getRwid());
+									}
+									if (!list.contains(rw2.getRwid())) {
+										mmcPlanIdList1.add(rw2);
+									}
+								}
 							}
 						}
-						rwNode3.add(rwNode4);
+						//4,策划节点
+						for (Rw rw2 : mmcPlanIdList1) {
+							TreeNode rwNode4 = new DepartmentNode(Long.valueOf(rw2.getRwid()), rw2.getRwname(), "0", rwNode3, 2);
+
+							List<Mmc> mmcFileIdList = DataSupport.where("PlanId = ?", rw2.getRwid()).find(Mmc.class);
+							if (mmcFileIdList.size() > 0) {
+								//5，文件节点
+								for (Mmc mmc : mmcFileIdList) {
+									rwNode4.add(new UserNode(Long.valueOf(mmc.getMmc_Id()), mmc.getMmc_Name(), rwNode4, 3));
+								}
+							}
+							rwNode3.add(rwNode4);
+						}
+						rootNode.add(rwNode3);
 					}
-					rootNode.add(rwNode3);
+					rootNode.expandAllNode();
+					rootNode.filterVisibleNode(nodeList);
 				}
-//				productNode.add(rwNode);
-				rootNode.expandAllNode();
-				rootNode.filterVisibleNode(nodeList);
 			}
-//			rootNode.add(productNode);
-		}
-
-//		if(mmcProductList.size() > 0){
-//			//1,型号节点
-//			for(Product product : mmcProductList){
-////				rootNode = new DepartmentNode(-1, product.getProduct_Name(), null, 0);
-//				TreeNode productNode = new DepartmentNode(Long.valueOf(product.getProduct_Id()), product.getProduct_Name(), "0", rootNode, 1);
-//				List<Mmc> mmcCategoryList = DataSupport.where("productId = ?", product.getProduct_Id()).find(Mmc.class);
-//				List<Rw> mmcCategoryList1 = new ArrayList<>();
-//				if (mmcCategoryList.size() > 0) {
-//					for (Mmc mmc : mmcCategoryList) {
-//						Rw rw = new Rw();
-//						rw.setRwid(mmc.getCategoryId());
-//						rw.setRwname(mmc.getCategoryName());
-//						if (mmcCategoryList1.size() == 0) {
-//							mmcCategoryList1.add(rw);
-//						} else {
-//							List<String> list = new ArrayList<String>();
-//							for (Rw rw12 : mmcCategoryList1) {
-//								list.add(rw12.getRwid());
-//							}
-//							if (!list.contains(rw.getRwid())) {
-//								mmcCategoryList1.add(rw);
-//							}
-//						}
-//					}
-//				}
-//
+		} else {
+//			List<Mmc> mmcbatchList = new ArrayList<>();
+//			if (fieldType.equals("3")) {
+//				mmcbatchList = DataSupport.where("categoryId = ? and fieldType=?", rw.getRwid(), fieldType).find(Mmc.class);
+//			} else if (fieldType.equals("2")) {
+//				mmcbatchList = DataSupport.where("categoryId = ? and fieldType=?", rw.getRwid(), fieldType).find(Mmc.class);
 //			}
-//		}else{
-//			rootNode = new DepartmentNode(Long.valueOf(-1), "无", "0", null, 0);
-//		}
-//		nodeList.add(rootNode);
-
-
+			if (mmcList.size() > 0) {
+				StringBuffer stringBuffer = new StringBuffer();
+				for (int k = 0; k < mmcList.size(); k++) {
+					if (!stringBuffer.toString().contains(mmcList.get(k).getPlanId())) {
+						rootNode = new DepartmentNode(Long.valueOf(mmcList.get(k).getPlanId()), mmcList.get(k).getPlanName(), "0", null, 0);
+						List<Mmc> mmcs = DataSupport.where("PlanId = ? ", mmcList.get(k).getPlanId()).find(Mmc.class);
+						for (Mmc mmc : mmcs) {
+							rootNode.add(new UserNode(Long.valueOf(mmc.getMmc_Id()), mmc.getMmc_Name(), rootNode, 2));
+						}
+						stringBuffer.append(mmcList.get(k).getPlanId());
+						rootNode.expandAllNode();
+						rootNode.filterVisibleNode(nodeList);
+					}
+				}
+			}
+		}
 		adapter.notifyDataSetChanged();
 	}
 	
@@ -278,12 +266,6 @@ public class DocActivity extends BaseActivity{
 							}
 						}
 					}).start();
-//					String path = Environment.getExternalStorageDirectory() + File.separator + "mmc" + 
-//							 File.separator + mmc.getMmc_Id() + "." + mmc.getType();
-//					File file = new File(path);
-//					File file = new File(secret_end);
-//					boolean s = file.exists();
-//					ThridToolUtils.openFile(file, DocActivity.this);
 				}else{
 					Toast.makeText(DocActivity.this, "该文件不存在，请联系管理员", Toast.LENGTH_SHORT).show();
 				}

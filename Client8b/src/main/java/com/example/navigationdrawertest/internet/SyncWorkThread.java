@@ -436,6 +436,7 @@ public class SyncWorkThread extends Thread {
 				String categoryName = CommonTools.null2String(userElement.getAttribute("categoryName"));
 				String productId = CommonTools.null2String(userElement.getAttribute("modelId"));
 				String modelName = CommonTools.null2String(userElement.getAttribute("modelName"));
+				String fieldType = CommonTools.null2String(userElement.getAttribute("fieldType"));
 
 				Mmc mmc = new Mmc();
 				mmc.setMmc_Id(mmc_Id);
@@ -454,6 +455,7 @@ public class SyncWorkThread extends Thread {
 				mmc.setCategoryName(categoryName);
 				mmc.setProductId(productId);
 				mmc.setProductName(modelName);
+				mmc.setFieldType(fieldType);
 				newmmcList.add(mmc);
 			}
 			// List<String> addList = new ArrayList<String>();

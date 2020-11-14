@@ -251,15 +251,19 @@ public class FragmentUpload extends Fragment{
 					bcRelationList = DataSupport.where("ssxh = ? and fieldType = ?", BCproEntity.getSsxh(), "2").find(BCRelation.class);
 				}
 				if (bcRelationList.size() > 0) {
+					StringBuffer stringBuffer = new StringBuffer();
 					for (int k = 0; k < bcRelationList.size(); k++) {
-						List<Task> BCtaskList = DataSupport.where("location = ? and chId =?", "4", bcRelationList.get(k).getChid()).find(Task.class);;
-						if (BCtaskList.size() > 0) {
-							TreeNode node = new DepartmentNode(Long.valueOf(bcRelationList.get(k).getChid()), bcRelationList.get(k).getChname(), "0", rootNode, 1);
-							for (int loop = 0; loop < BCtaskList.size(); loop++) {
-								node.add(new UserNode(Long.valueOf(BCtaskList.get(loop).getTaskid()), BCtaskList.get(loop).getTaskname(), node, 2));
+						if (!stringBuffer.toString().contains(bcRelationList.get(k).getChid())) {
+							List<Task> BCtaskList = DataSupport.where("location = ? and chId =?", "4", bcRelationList.get(k).getChid()).find(Task.class);;
+							if (BCtaskList.size() > 0) {
+								TreeNode node = new DepartmentNode(Long.valueOf(bcRelationList.get(k).getChid()), bcRelationList.get(k).getChname(), "0", rootNode, 1);
+								for (int loop = 0; loop < BCtaskList.size(); loop++) {
+									node.add(new UserNode(Long.valueOf(BCtaskList.get(loop).getTaskid()), BCtaskList.get(loop).getTaskname(), node, 2));
+								}
+								rootNode.add(node);
 							}
-							rootNode.add(node);
 						}
+						stringBuffer.append(bcRelationList.get(k).getChid());
 					}
 				}
 			}
